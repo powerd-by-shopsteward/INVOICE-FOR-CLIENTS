@@ -886,8 +886,8 @@
             document.getElementById('prev-words').innerText = numberToWords(total);
         }
 
-        // === PRINT HISTORICAL INVOICE (FIXED) ===
-        window.printHistoricalInvoice = function(invId) {
+                // === PREVIEW HISTORICAL INVOICE ===
+        window.previewHistoricalInvoice = function(invId) {
             const invoice = allInvoices.find(i => i.id === invId);
             if (!invoice) return alert("Invoice not found");
 
@@ -906,11 +906,79 @@
             invoiceItems = invoice.items || [];
             renderInvoiceItems();
             updateInvoicePreview();
+        };
 
-            // Wait a moment for the DOM to fully render the view, then print
+        // === PRINT HISTORICAL INVOICE (FIXED) ===
+        window.printHistoricalInvoice = function(invId) {
+            const invoice = allInvoices.find(i => i.id === invId);
+            if (!invoice) return alert("Invoice not found");
+
+            // Create a hidden iframe to render and print just the invoice
+            const iframe = document.createElement('iframe');
+            iframe.style.position = 'absolute';
+            iframe.style.width = '0px';
+            iframe.style.height = '0px';
+            iframe.style.border = 'none';
+            document.body.appendChild(iframe);
+
+            const doc = iframe.contentWindow.document;
+
+            // Navigate to Create View to populate the DOM
+            window.location.hash = '#create';
+
             setTimeout(() => {
-                window.print();
-            }, 800);
+                // Populate form fields
+                document.getElementById('inv-no').value = invoice.invoice_number;
+                document.getElementById('inv-date').value = invoice.date;
+                document.getElementById('inv-client').value = invoice.client_name || '';
+                document.getElementById('inv-address').value = invoice.client_address || '';
+                document.getElementById('inv-tax').value = invoice.tax_rate || 0;
+                document.getElementById('inv-discount').value = invoice.discount || 0;
+
+                // Populate items
+                invoiceItems = invoice.items || [];
+                renderInvoiceItems();
+                updateInvoicePreview();
+
+                // Wait for the DOM to fully render, then extract HTML and inject into iframe
+                setTimeout(() => {
+                    const printContents = document.getElementById('invoice-preview').outerHTML;
+                    
+                    // Get all styles from the main document
+                    let stylesHTML = '';
+                    document.querySelectorAll('style, link[rel="stylesheet"]').forEach(el => {
+                        stylesHTML += el.outerHTML;
+                    });
+
+                    doc.open();
+                    doc.write(`
+                        <html>
+                            <head>
+                                ${stylesHTML}
+                                <style>
+                                    /* Override styles for printing */
+                                    body { background: white !important; margin: 0; padding: 0; }
+                                    .invoice-paper { box-shadow: none !important; border: none !important; margin: 0 auto; }
+                                    .invoice-wrapper { padding: 0 !important; display: block !important; }
+                                </style>
+                            </head>
+                            <body>
+                                ${printContents}
+                            </body>
+                        </html>
+                    `);
+                    doc.close();
+
+                    // Wait for images/fonts to load, then print
+                    setTimeout(() => {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                        
+                        // Clean up iframe after printing
+                        setTimeout(() => document.body.removeChild(iframe), 1000);
+                    }, 500);
+                }, 500);
+            }, 100);
         };
 
         // === SAVE INVOICE ===
@@ -980,9 +1048,10 @@
                                 <td style="color: var(--text-muted);">${new Date(inv.date).toLocaleDateString('en-GB')}</td>
                                 <td style="font-weight: bold; color: var(--success);">₹${Number(inv.total).toFixed(2)}</td>
                                 <td><span style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 4px 8px; border-radius: 6px; font-size: 12px;">Paid</span></td>
-                                <td style="text-align: right;">
-                                    <button onclick="printHistoricalInvoice('${inv.id}')" class="btn btn-primary btn-sm">Print</button>
-                                </td>
+                                <td style="text-align: right; white-space: nowrap;">
+    <button onclick="previewHistoricalInvoice('${inv.id}')" class="btn glass-panel btn-sm" style="color: white; border: 1px solid var(--glass-border); margin-right: 8px;">Preview</button>
+    <button onclick="printHistoricalInvoice('${inv.id}')" class="btn btn-primary btn-sm">Print</button>
+</td>
                             </tr>
                         `;
                     });
