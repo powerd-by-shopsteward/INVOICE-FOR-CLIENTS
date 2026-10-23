@@ -218,8 +218,10 @@
         }
         .inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
         .inv-brand { display: flex; gap: 15px; align-items: center; }
+        
+        /* Adjusted image properties to handle external files smoothly */
         .logo-img { max-width: 120px; max-height: 70px; object-fit: contain; }
-        .logo-fallback { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 700; color: var(--primary); display: none; }
+        
         .brand-text h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; margin-bottom: 4px; color: #111827; }
         .brand-text p { font-size: 11px; color: #4b5563; line-height: 1.5; }
         .inv-title h2 { font-family: Georgia, serif; font-size: 28px; color: #111827; letter-spacing: 1px; font-weight: normal; }
@@ -265,33 +267,21 @@
         .totals-table .grand-total-row td { font-weight: 700; font-size: 14px; border-bottom: none; }
 
         .signature-area { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 15px; border-top: 1px solid var(--border-invoice); min-height: 100px; }
+        
         .signature-img { max-width: 150px; max-height: 60px; object-fit: contain; margin-bottom: 5px; }
+        
         .signature-line { width: 160px; border-bottom: 1px solid #9ca3af; margin-bottom: 6px; }
         .signature-area p { font-size: 10px; color: #6b7280; text-transform: uppercase; font-weight: 600; }
 
         /* === PRINT STYLES === */
         @media print {
             @page { size: A4; margin: 0; }
-            
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
             body { background: white; height: auto; overflow: visible; }
             .sidebar, .bg-blob { display: none !important; }
             .app-container { display: block; }
             .preview-area { padding: 0; background: white; overflow: visible; display: block; }
-            
-            .invoice-paper { 
-                box-shadow: none; 
-                width: 100%; 
-                min-height: 100vh; 
-                margin: 0; 
-                padding: 15mm; 
-                border-radius: 0; 
-            }
+            .invoice-paper { box-shadow: none; width: 100%; min-height: 100vh; margin: 0; padding: 15mm; border-radius: 0; }
             .inv-table { page-break-inside: auto; }
             .inv-table tr { page-break-inside: avoid; page-break-after: auto; }
             .inv-footer-grid { page-break-inside: avoid; }
@@ -300,7 +290,6 @@
 </head>
 <body>
 
-    <!-- Background Gradient Blobs -->
     <div class="bg-blob blob-1"></div>
     <div class="bg-blob blob-2"></div>
     <div class="bg-blob blob-3"></div>
@@ -320,27 +309,24 @@
                     <h3>Business Profile</h3>
                     <div class="input-group">
                         <label>Business Name</label>
-                        <!-- UPDATED DEFAULT VALUE -->
                         <input type="text" id="biz-name" value="ShopSteward.in">
                     </div>
                     <div class="input-group">
                         <label>Address</label>
-                        <!-- UPDATED DEFAULT VALUE -->
                         <input type="text" id="biz-address" value="Kutki, infront of Shiva Tample , Medinipur, West Bengal, 721451">
                     </div>
                     <div class="input-group">
                         <label>Contact Info</label>
-                        <!-- UPDATED DEFAULT VALUE -->
                         <input type="text" id="biz-contact" value="shopsteward.in@gmail.com / 8637560557">
                     </div>
                     
                     <div class="file-upload-row">
                         <div class="file-upload">
-                            <label>Logo</label>
+                            <label>Upload Custom Logo</label>
                             <input type="file" id="logo-upload" accept="image/*">
                         </div>
                         <div class="file-upload">
-                            <label>Signature</label>
+                            <label>Upload Custom Signature</label>
                             <input type="file" id="signature-upload" accept="image/*">
                         </div>
                     </div>
@@ -395,9 +381,7 @@
                         <h3>Services & Add-ons</h3>
                         <button id="add-item-btn" class="btn-pill-add">+ Add</button>
                     </div>
-                    <div id="items-container">
-                        <!-- Items injected by JS -->
-                    </div>
+                    <div id="items-container"></div>
                 </div>
 
                 <!-- Taxes & Adjustments -->
@@ -453,8 +437,10 @@
                 <!-- Top Header -->
                 <div class="inv-header">
                     <div class="inv-brand">
-                        <img id="preview-logo" src="" alt="Logo" class="logo-img" style="display: none;">
-                        <div id="logo-fallback" class="logo-fallback"></div>
+                        
+                        <!-- GITHUB INTEGRATION: This points to logo.png in your folder -->
+                        <img id="preview-logo" src="image/logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+                        
                         <div class="brand-text">
                             <h1 id="preview-biz-name"></h1>
                             <p id="preview-biz-address"></p>
@@ -538,7 +524,8 @@
 
                         <div class="signature-area">
                             <div class="signature-box">
-                                <img id="preview-signature" src="" alt="Signature" class="signature-img" style="display: none;">
+                                <!-- GITHUB INTEGRATION: This points to signature.png in your folder -->
+                                <img id="preview-signature" src="image/signature.png" alt="Signature" class="signature-img" onerror="this.style.display='none'">
                             </div>
                             <div class="signature-line"></div>
                             <p>Authorized Signature</p>
@@ -560,11 +547,11 @@
             const addItemBtn = document.getElementById('add-item-btn');
             const accentColorInput = document.getElementById('accent-color');
             
-            // Bumped version to v6 to force the new business details to load
-            const STORAGE_KEY = 'invoice_data_blank_v6';
-            const LOGO_KEY = 'invoice_logo_blank_v6';
-            const SIG_KEY = 'invoice_signature_blank_v6';
-            const ACCENT_KEY = 'invoice_accent_blank_v6';
+            // Bumped to v8 to clear old base64 cached data
+            const STORAGE_KEY = 'invoice_data_blank_v8';
+            const LOGO_KEY = 'invoice_logo_blank_v8';
+            const SIG_KEY = 'invoice_signature_blank_v8';
+            const ACCENT_KEY = 'invoice_accent_blank_v8';
 
             const inputsToTrack = [
                 'biz-name', 'biz-address', 'biz-contact', 'client-name', 'client-address', 
@@ -730,9 +717,9 @@
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(event) {
-                        document.getElementById('preview-logo').src = event.target.result;
-                        document.getElementById('preview-logo').style.display = 'block';
-                        document.getElementById('logo-fallback').style.display = 'none';
+                        const img = document.getElementById('preview-logo');
+                        img.src = event.target.result;
+                        img.style.display = 'block';
                         localStorage.setItem(LOGO_KEY, event.target.result);
                     };
                     reader.readAsDataURL(file);
@@ -744,8 +731,9 @@
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function(event) {
-                        document.getElementById('preview-signature').src = event.target.result;
-                        document.getElementById('preview-signature').style.display = 'block';
+                        const img = document.getElementById('preview-signature');
+                        img.src = event.target.result;
+                        img.style.display = 'block';
                         localStorage.setItem(SIG_KEY, event.target.result);
                     };
                     reader.readAsDataURL(file);
@@ -795,17 +783,22 @@
                     document.querySelector('.scroll-area').scrollTop = document.querySelector('.scroll-area').scrollHeight;
                 });
 
+                // If a custom uploaded logo exists in local storage, override the GitHub image
                 const savedLogo = localStorage.getItem(LOGO_KEY);
                 if(savedLogo) {
-                    document.getElementById('preview-logo').src = savedLogo;
-                    document.getElementById('preview-logo').style.display = 'block';
-                    document.getElementById('logo-fallback').style.display = 'none';
+                    const img = document.getElementById('preview-logo');
+                    img.src = savedLogo;
+                    img.style.display = 'block';
                 }
+                
+                // If a custom uploaded signature exists in local storage, override the GitHub image
                 const savedSig = localStorage.getItem(SIG_KEY);
                 if(savedSig) {
-                    document.getElementById('preview-signature').src = savedSig;
-                    document.getElementById('preview-signature').style.display = 'block';
+                    const img = document.getElementById('preview-signature');
+                    img.src = savedSig;
+                    img.style.display = 'block';
                 }
+                
                 const savedAccent = localStorage.getItem(ACCENT_KEY);
                 if(savedAccent) {
                     document.documentElement.style.setProperty('--primary', savedAccent);
@@ -824,7 +817,7 @@
             document.getElementById('print-btn').addEventListener('click', () => { window.print(); });
 
             document.getElementById('clear-data-btn').addEventListener('click', () => {
-                if(confirm("Are you sure you want to reset all data?")) { 
+                if(confirm("Are you sure you want to reset all data? This will revert to your GitHub hosted logo and signature.")) { 
                     localStorage.removeItem(STORAGE_KEY);
                     localStorage.removeItem(LOGO_KEY);
                     localStorage.removeItem(SIG_KEY);
