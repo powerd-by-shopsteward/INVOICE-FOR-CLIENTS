@@ -55,6 +55,8 @@
                 <h3>Invoice Details</h3>
                 <input type="text" id="inv-number" placeholder="Invoice No" value="INV-101">
                 <input type="date" id="inv-date">
+                <input type="text" id="po-number" placeholder="P.O. Number" value="SO-17">
+                <input type="text" id="subject-text" placeholder="Subject" value="Website Design & Development">
             </div>
 
             <!-- Items (Services) -->
@@ -100,7 +102,7 @@
     <div class="preview-area">
         <div class="invoice-paper" id="invoice-paper">
             
-            <!-- Header -->
+            <!-- Top Header -->
             <div class="inv-header">
                 <div class="inv-brand">
                     <img id="preview-logo" src="" alt="Logo" class="logo-img" style="display: none;">
@@ -116,23 +118,35 @@
                 </div>
             </div>
 
-            <!-- Info Grid -->
-            <div class="inv-info-grid">
-                <div class="info-box">
-                    <h4>BILLED TO</h4>
+            <!-- Meta Grid (Invoice No, Date, etc) -->
+            <div class="inv-meta-grid">
+                <div class="meta-box">
+                    <div class="meta-row"><span>#</span><strong id="preview-inv-number">INV-101</strong></div>
+                    <div class="meta-row"><span>Invoice Date</span><strong id="preview-inv-date">-</strong></div>
+                    <div class="meta-row"><span>Terms</span><strong>Due on Receipt</strong></div>
+                    <div class="meta-row"><span>P.O.#</span><strong id="preview-po-number">SO-17</strong></div>
+                </div>
+                <div class="meta-box right-empty">
+                    <!-- Empty right side to match reference structure -->
+                </div>
+            </div>
+
+            <!-- Address Grid -->
+            <div class="inv-address-grid">
+                <div class="address-box">
+                    <h4>BILL TO</h4>
                     <p class="client-name" id="preview-client-name">Rob & Joe Traders</p>
                     <p id="preview-client-address">34, Richie Street, Chennai<br>631603 Tamil Nadu, India</p>
                 </div>
-                <div class="info-box right-align">
-                    <div class="meta-row">
-                        <span>Invoice No:</span>
-                        <strong id="preview-inv-number">INV-101</strong>
-                    </div>
-                    <div class="meta-row">
-                        <span>Date:</span>
-                        <strong id="preview-inv-date">-</strong>
-                    </div>
+                <div class="address-box">
+                    <h4>SHIP TO</h4>
+                    <p id="preview-ship-address">34, Richie Street, Chennai<br>631603 Tamil Nadu, India</p>
                 </div>
+            </div>
+
+            <!-- Subject -->
+            <div class="inv-subject">
+                <span>Subject:</span> <span id="preview-subject-text">Website Design & Development</span>
             </div>
 
             <!-- Items Table -->
@@ -140,9 +154,11 @@
                 <thead>
                     <tr>
                         <th width="5%">#</th>
-                        <th width="55%">Item & Description</th>
-                        <th width="20%" class="text-right">Rate</th>
-                        <th width="20%" class="text-right">Amount</th>
+                        <th width="45%">Item & Description</th>
+                        <th width="15%" class="text-right">Rate</th>
+                        <th width="10%" class="text-right">Tax %</th>
+                        <th width="10%" class="text-right">Tax</th>
+                        <th width="15%" class="text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody id="preview-table-body">
@@ -150,19 +166,28 @@
                 </tbody>
             </table>
 
-            <!-- Footer Totals -->
-            <div class="inv-footer">
+            <!-- Footer Grid -->
+            <div class="inv-footer-grid">
+                
+                <!-- Left Side (Words, Notes, Terms) -->
                 <div class="footer-left">
                     <div class="words-section">
                         <h4>Total In Words</h4>
                         <p id="preview-words" class="words-text">Indian Rupee Zero Only</p>
                     </div>
+                    
+                    <div class="notes-section">
+                        <h4>Notes</h4>
+                        <p>Thanks for your business.</p>
+                    </div>
+
                     <div class="terms-section">
                         <h4>Terms & Conditions</h4>
                         <p id="preview-terms">This service is subject to an annual subscription fee...</p>
                     </div>
                 </div>
                 
+                <!-- Right Side (Totals & Signature) -->
                 <div class="footer-right">
                     <table class="totals-table">
                         <tr>
@@ -187,8 +212,11 @@
                         </tr>
                     </table>
 
+                    <!-- Signature Area -->
                     <div class="signature-area">
-                        <img id="preview-signature" src="" alt="Signature" class="signature-img" style="display: none;">
+                        <div class="signature-box">
+                            <img id="preview-signature" src="" alt="Signature" class="signature-img" style="display: none;">
+                        </div>
                         <div class="signature-line"></div>
                         <p>Authorized Signature</p>
                     </div>
