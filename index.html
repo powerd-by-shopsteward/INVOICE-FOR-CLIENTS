@@ -11,7 +11,7 @@
     
     <style>
         /* ============================================================
-           FLUX AURORA THEME
+           FLUX AURORA DASHBOARD THEME
            ============================================================ */
         :root {
             --bg-dark: #0d1117;
@@ -36,7 +36,7 @@
             position: relative;
         }
 
-        /* === AURORA BACKGROUND BLOBS === */
+        /* Aurora Background Blobs */
         .aurora-blob {
             position: fixed;
             border-radius: 50%;
@@ -54,7 +54,7 @@
             100% { transform: translate(5%, 5%) scale(1.1); }
         }
 
-        /* === UTILITIES === */
+        /* Global Utilities */
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(24px);
@@ -69,9 +69,8 @@
         }
         .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
-        .btn-danger:hover { background: var(--danger); color: white; }
         .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; transform: translateY(-1px); }
         
         .input-glass {
             width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1);
@@ -80,11 +79,10 @@
         }
         .input-glass:focus { border-color: var(--primary); }
 
-        /* === LAYOUT === */
+        /* Layout */
         .app-container { display: none; height: 100vh; }
         .app-container.active { display: flex; }
 
-        /* Sidebar */
         .sidebar {
             position: fixed; left: 24px; top: 50%; transform: translateY(-50%);
             z-index: 50; display: flex; flex-direction: column; gap: 16px; padding: 12px; border-radius: 100px;
@@ -97,12 +95,9 @@
         .nav-item.active { background: var(--primary); color: white; box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
         .nav-item svg { width: 20px; height: 20px; }
 
-        /* Main Content */
         .main-content { flex: 1; margin-left: 100px; padding: 32px; overflow-y: auto; height: 100vh; }
-
-        /* Header */
         .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        
+
         /* Views */
         .view-section { display: none; animation: fadeIn 0.3s ease; }
         .view-section.active { display: block; }
@@ -113,33 +108,119 @@
         .bento-card { border-radius: 24px; padding: 24px; min-height: 200px; display: flex; flex-direction: column; }
         .bento-card h3 { font-size: 14px; color: var(--text-muted); font-weight: 500; margin-bottom: 10px; }
         .bento-card .value { font-size: 32px; font-weight: 700; color: white; }
-        .col-span-2 { grid-column: span 2; }
 
         /* Login Screen */
         #login-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 100; }
         .login-card { width: 100%; max-width: 400px; padding: 40px; border-radius: 24px; }
 
-        /* === INVOICE PREVIEW (A4) === */
-        .invoice-wrapper { background: #e2e8f0; padding: 20px; border-radius: 16px; overflow-x: auto; display: flex; justify-content: center; }
-        .invoice-paper {
-            width: 210mm; min-height: 297mm; background: #ffffff; color: #1f2937;
-            padding: 15mm; box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-family: 'Inter', sans-serif;
-            transform-origin: top center;
+
+        /* ============================================================
+           🟢 INVOICE TEMPLATE CSS (MODULAR)
+           Edit the structure below to change the look.
+           ============================================================ */
+        
+        .invoice-wrapper { 
+            background: #e2e8f0; 
+            padding: 20px; 
+            border-radius: 16px; 
+            overflow-x: auto; 
+            display: flex; 
+            justify-content: center; 
         }
         
-        .inv-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 20px; }
-        .inv-title h2 { font-family: 'Georgia', serif; font-size: 28px; color: #111827; margin: 0; }
-        .inv-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; font-size: 12px; }
-        .inv-meta-box { border: 1px solid #94a3b8; padding: 10px; }
-        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
-        .inv-table th { background: #f3f4f6; padding: 10px; text-align: left; border: 1px solid #e5e7eb; font-weight: 600; }
-        .inv-table td { padding: 10px; border: 1px solid #e5e7eb; vertical-align: top; }
-        .inv-totals { width: 50%; float: right; font-size: 12px; }
-        .inv-totals td { padding: 8px; border-bottom: 1px solid #e5e7eb; }
-        .inv-totals .grand-total td { font-weight: bold; font-size: 14px; border-bottom: 2px solid #111827; }
-        .signature-box { margin-top: 40px; text-align: right; font-size: 12px; }
-        .signature-box img { max-width: 150px; max-height: 60px; object-fit: contain; margin-bottom: 5px; }
+        .invoice-paper {
+            /* These variables control the invoice colors */
+            --inv-primary: #7c9c46; 
+            --inv-text: #111827;
+            --inv-muted: #6b7280;
+            --inv-border: #e5e7eb;
 
+            width: 210mm; 
+            min-height: 297mm; 
+            background: #ffffff; 
+            color: var(--inv-text);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 1. Header */
+        .inv-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 15mm 15mm 5mm 15mm; }
+        .inv-brand h1 { font-family: 'Georgia', serif; font-size: 24px; margin: 0 0 4px 0; color: var(--inv-text); font-weight: normal; }
+        .inv-brand p { font-size: 12px; color: var(--inv-muted); margin: 0; }
+        .inv-title h2 { font-family: 'Arial', sans-serif; font-size: 36px; color: var(--inv-text); margin: 0; font-weight: normal; letter-spacing: 1px; }
+        
+        /* 2. Meta Bar */
+        .inv-meta-bar { 
+            background-color: var(--inv-primary); 
+            color: white; 
+            padding: 8px 15mm; 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .inv-meta-item span { font-weight: normal; opacity: 0.9; margin-right: 5px; }
+
+        /* 3. Customer Info */
+        .inv-customer-box { 
+            background: #f9fafb; 
+            padding: 12px 15mm; 
+            border-bottom: 1px solid var(--inv-border);
+            font-size: 12px;
+        }
+        .inv-customer-box .label { color: var(--inv-primary); font-weight: bold; margin-bottom: 4px; display: block; }
+        .inv-customer-box .client-name { font-weight: bold; color: var(--inv-text); font-size: 14px; }
+        .inv-customer-box .client-address { color: var(--inv-muted); margin-top: 2px; }
+
+        /* 4. Table */
+        .inv-table-container { padding: 0 15mm; flex-grow: 1; }
+        .inv-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .inv-table th { 
+            background-color: var(--inv-primary); 
+            color: white; 
+            padding: 8px; 
+            text-align: left; 
+            font-weight: 600; 
+            text-transform: uppercase;
+        }
+        .inv-table td { 
+            padding: 10px 8px; 
+            border-bottom: 1px solid var(--inv-border); 
+            vertical-align: top;
+            color: var(--inv-text);
+        }
+        .inv-table .empty-row td { height: 24px; color: transparent; }
+        
+        /* 5. Totals */
+        .inv-totals-container { display: flex; justify-content: flex-end; padding: 10px 15mm; }
+        .inv-totals { width: 50%; font-size: 12px; }
+        .inv-totals td { padding: 6px 8px; border-bottom: 1px solid var(--inv-border); }
+        .inv-totals td:first-child { text-align: right; font-weight: 600; color: var(--inv-muted); text-transform: uppercase; }
+        .inv-totals td:last-child { text-align: right; font-weight: bold; }
+        .inv-totals .grand-total td { border-top: 2px solid var(--inv-text); border-bottom: 2px solid var(--inv-text); font-size: 14px; color: var(--inv-text); }
+
+        /* 6. Bottom (Terms & Signature) */
+        .inv-bottom-section { padding: 10mm 15mm; display: flex; justify-content: space-between; align-items: flex-end; }
+        .inv-notes { width: 60%; font-size: 11px; color: var(--inv-muted); }
+        .inv-notes h4 { font-size: 12px; color: var(--inv-text); margin: 0 0 4px 0; }
+        
+        .signature-box { text-align: center; font-size: 11px; color: var(--inv-muted); }
+        .signature-box img { max-width: 150px; max-height: 60px; object-fit: contain; margin-bottom: 5px; display: block; margin-left: auto; margin-right: auto; }
+        .signature-line { width: 180px; border-bottom: 1px solid #9ca3af; margin-bottom: 5px; }
+        
+        /* 7. Footer */
+        .inv-footer { 
+            background-color: var(--inv-primary); 
+            color: white; 
+            text-align: center; 
+            padding: 10px 15mm; 
+            font-size: 11px;
+            margin-top: auto;
+        }
+
+        /* Print Styles */
         @media print {
             body * { visibility: hidden; }
             .invoice-paper, .invoice-paper * { visibility: visible; }
@@ -150,12 +231,12 @@
 </head>
 <body>
 
-    <!-- 🌌 Aurora Background Elements -->
+    <!-- Background Elements -->
     <div class="aurora-blob blob-purple"></div>
     <div class="aurora-blob blob-teal"></div>
     <div class="aurora-blob blob-pink"></div>
 
-    <!-- 🔒 Login Screen -->
+    <!-- Login Screen -->
     <div id="login-screen">
         <div class="glass-panel login-card">
             <div style="text-align: center; margin-bottom: 30px;">
@@ -175,7 +256,7 @@
         </div>
     </div>
 
-    <!-- 🚀 Main App Shell -->
+    <!-- App Shell -->
     <div id="app" class="app-container">
         
         <!-- Sidebar -->
@@ -194,12 +275,10 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
+        <!-- Main Content -->
         <main class="main-content">
-            
-            <!-- Top Header -->
             <header class="top-header">
-                <div></div> <!-- Spacer -->
+                <div></div>
                 <div style="display: flex; gap: 16px; align-items: center;">
                     <button id="btn-create-invoice" class="btn btn-primary">+ Create Invoice</button>
                     <div class="glass-panel" style="padding: 8px 16px; border-radius: 16px; font-size: 13px;">
@@ -208,12 +287,9 @@
                 </div>
             </header>
 
-            <!-- 👇 VIEWS (Pages) 👇 -->
-
             <!-- View: Dashboard -->
             <section id="view-dashboard" class="view-section active">
                 <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans';">Dashboard</h1>
-                
                 <div class="bento-grid">
                     <div class="bento-card glass-panel">
                         <h3>Total Revenue</h3>
@@ -230,7 +306,7 @@
                 </div>
             </section>
 
-            <!-- View: Invoices (History) -->
+            <!-- View: Invoices -->
             <section id="view-invoices" class="view-section">
                 <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans'; margin-bottom: 20px;">Invoice History</h1>
                 <div class="glass-panel" style="border-radius: 24px; padding: 20px; overflow-x: auto;">
@@ -244,9 +320,7 @@
                                 <th style="padding: 12px;">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="invoice-list">
-                            <!-- Invoices injected here -->
-                        </tbody>
+                        <tbody id="invoice-list"></tbody>
                     </table>
                 </div>
             </section>
@@ -257,7 +331,6 @@
                 <p style="color: var(--text-muted); margin-top: 4px; margin-bottom: 24px;">These details will automatically appear on your invoices.</p>
                 
                 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
-                    <!-- Details Form -->
                     <div class="glass-panel" style="padding: 24px; border-radius: 24px;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                             <div>
@@ -269,26 +342,21 @@
                                 <input type="text" id="prof-website" class="input-glass" placeholder="www.shopsteward.in">
                             </div>
                         </div>
-                        
                         <div style="margin-bottom: 16px;">
                             <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">Contact Info</label>
                             <input type="text" id="prof-contact" class="input-glass" placeholder="shopsteward.in@gmail.com / 8637560557">
                         </div>
-
                         <div style="margin-bottom: 16px;">
                             <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">Address</label>
                             <textarea id="prof-address" class="input-glass" rows="2"></textarea>
                         </div>
-                        
                         <div style="margin-bottom: 24px;">
                             <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">Default Terms</label>
                             <textarea id="prof-terms" class="input-glass" rows="3"></textarea>
                         </div>
-                        
                         <button id="btn-save-profile" class="btn btn-primary" style="width: 100%;">Save Profile</button>
                     </div>
 
-                    <!-- Branding Assets -->
                     <div class="glass-panel" style="padding: 24px; border-radius: 24px;">
                         <div style="margin-bottom: 24px;">
                             <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">Business Logo</label>
@@ -298,7 +366,6 @@
                             </div>
                             <input type="file" id="upload-logo" style="font-size: 12px; color: var(--text-muted);">
                         </div>
-
                         <div>
                             <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">Signature</label>
                             <div style="width: 100%; height: 120px; background: rgba(0,0,0,0.2); border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden;">
@@ -311,20 +378,23 @@
                 </div>
             </section>
 
-            <!-- View: Create Invoice (Full screen layout) -->
+            <!-- View: Create Invoice -->
             <section id="view-create" class="view-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <div>
                         <a href="#invoices" style="color: var(--text-muted); font-size: 14px; text-decoration: none;">← Back to Invoices</a>
                         <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans'; margin-top: 8px;">Create Invoice</h1>
                     </div>
-                    <button id="btn-save-invoice" class="btn btn-success" style="padding: 12px 24px;">Save Invoice to Cloud</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="window.print()" class="btn glass-panel" style="color: white; border: 1px solid var(--glass-border);">Print / PDF</button>
+                        <button id="btn-save-invoice" class="btn btn-success" style="padding: 12px 24px;">Save Invoice</button>
+                    </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+                    
                     <!-- Form Side -->
                     <div class="glass-panel" style="padding: 24px; border-radius: 24px; display: flex; flex-direction: column; gap: 16px;">
-                        
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                             <div>
                                 <label style="font-size: 12px; color: var(--text-muted);">Invoice No.</label>
@@ -335,7 +405,6 @@
                                 <input type="date" id="inv-date" class="input-glass">
                             </div>
                         </div>
-
                         <div>
                             <label style="font-size: 12px; color: var(--text-muted);">Client Name</label>
                             <input type="text" id="inv-client" class="input-glass" placeholder="Rob & Joe Traders">
@@ -344,18 +413,13 @@
                             <label style="font-size: 12px; color: var(--text-muted);">Client Address</label>
                             <textarea id="inv-address" class="input-glass" rows="2" placeholder="34, Richie Street, Chennai"></textarea>
                         </div>
-
                         <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                                 <h3 style="font-size: 14px; font-weight: 600;">Line Items</h3>
                                 <button id="btn-add-item" style="background: rgba(255,255,255,0.1); border: none; color: white; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">+ Add Item</button>
                             </div>
-                            
-                            <div id="items-container" style="display: flex; flex-direction: column; gap: 10px;">
-                                <!-- Items injected here -->
-                            </div>
+                            <div id="items-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
                         </div>
-
                         <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                             <div>
                                 <label style="font-size: 12px; color: var(--text-muted);">Tax Rate (%)</label>
@@ -365,79 +429,95 @@
                                 <label style="font-size: 12px; color: var(--text-muted);">Discount (₹)</label>
                                 <input type="number" id="inv-discount" class="input-glass" value="0">
                             </div>
+                            <div style="grid-column: span 2;">
+                                <label style="font-size: 12px; color: var(--text-muted);">Invoice Color</label>
+                                <input type="color" id="inv-color" class="input-glass" value="#7c9c46" style="padding: 4px; height: 40px; cursor: pointer;">
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Preview Side (A4 Paper) -->
+                    <!-- ============================================================ -->
+                    <!-- 🟢 INVOICE TEMPLATE START (EDIT THIS BLOCK TO CHANGE STYLE) -->
+                    <!-- ============================================================ -->
                     <div class="invoice-wrapper" style="position: sticky; top: 20px;">
                         <div class="invoice-paper" id="invoice-preview">
+                            
                             <!-- Header -->
                             <div class="inv-header">
-                                <div style="display: flex; gap: 15px; align-items: center;">
-                                    <img id="prev-logo" src="" style="max-width: 100px; max-height: 60px; display: none;">
-                                    <div>
-                                        <h1 id="prev-biz-name" style="font-size: 20px; font-weight: 700; margin-bottom: 4px; color: #111827;">ShopSteward</h1>
-                                        <p id="prev-biz-address" style="font-size: 11px; color: #4b5563; line-height: 1.4;"></p>
-                                        <p id="prev-biz-contact" style="font-size: 11px; color: #4b5563; line-height: 1.4;"></p>
-                                        <p id="prev-biz-website" style="font-size: 11px; color: #4b5563; line-height: 1.4; font-weight: bold; color: var(--primary);"></p>
-                                    </div>
+                                <div class="inv-brand">
+                                    <h1 id="prev-biz-name">ShopSteward.in</h1>
+                                    <p id="prev-biz-slogan">Premium Service Billing</p>
                                 </div>
                                 <div class="inv-title">
-                                    <h2>TAX INVOICE</h2>
+                                    <h2>INVOICE</h2>
                                 </div>
                             </div>
 
-                            <!-- Meta -->
-                            <div class="inv-meta">
-                                <div class="inv-meta-box">
-                                    <p><span style="color: #6b7280; width: 80px; display: inline-block;">Invoice No:</span> <strong id="prev-inv-no">INV-001</strong></p>
-                                    <p style="margin-top: 5px;"><span style="color: #6b7280; width: 80px; display: inline-block;">Date:</span> <strong id="prev-inv-date">-</strong></p>
-                                    <p style="margin-top: 5px;"><span style="color: #6b7280; width: 80px; display: inline-block;">Terms:</span> <strong>Paid on Receipt</strong></p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <p style="font-weight: 700; color: #b91c1c;" id="prev-client">Client Name</p>
-                                    <p id="prev-address" style="margin-top: 4px; font-size: 11px; color: #4b5563;"></p>
-                                </div>
+                            <!-- Meta Bar -->
+                            <div class="inv-meta-bar">
+                                <div class="inv-meta-item"><span>DATE</span> <strong id="prev-inv-date">-</strong></div>
+                                <div class="inv-meta-item"><span>TERMS</span> <strong>Paid on Receipt</strong></div>
+                                <div class="inv-meta-item"><span>INVOICE #</span> <strong id="prev-inv-no">INV-001</strong></div>
                             </div>
 
-                            <!-- Items Table -->
-                            <table class="inv-table">
-                                <thead>
-                                    <tr>
-                                        <th width="5%">#</th>
-                                        <th width="55%">Item & Description</th>
-                                        <th width="20%" style="text-align: right;">Rate</th>
-                                        <th width="20%" style="text-align: right;">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="prev-items-body">
-                                    <!-- Items injected here -->
-                                </tbody>
-                            </table>
+                            <!-- Customer Info -->
+                            <div class="inv-customer-box">
+                                <span class="label">CUSTOMER INFO</span>
+                                <div class="client-name" id="prev-client">Client Name</div>
+                                <div class="client-address" id="prev-address">Client Address</div>
+                            </div>
 
-                            <!-- Totals -->
-                            <div style="overflow: hidden;">
-                                <div style="width: 50%; float: left; font-size: 11px; color: #4b5563; padding-right: 20px;">
-                                    <p style="font-weight: bold; margin-bottom: 4px;">Terms & Conditions</p>
-                                    <p id="prev-terms"></p>
-                                </div>
-                                <table class="inv-totals">
-                                    <tr><td style="text-align: right; color: #6b7280;">Sub Total</td><td style="text-align: right; font-weight: bold;" id="prev-subtotal">₹0.00</td></tr>
-                                    <tr><td style="text-align: right; color: #6b7280;">Tax (<span id="prev-tax-rate">18</span>%)</td><td style="text-align: right; font-weight: bold;" id="prev-tax-amt">₹0.00</td></tr>
-                                    <tr><td style="text-align: right; color: #6b7280;">Discount</td><td style="text-align: right; font-weight: bold; color: #b91c1c;" id="prev-discount">-₹0.00</td></tr>
-                                    <tr class="grand-total"><td style="text-align: right;">Total</td><td style="text-align: right;" id="prev-total">₹0.00</td></tr>
+                            <!-- Table -->
+                            <div class="inv-table-container">
+                                <table class="inv-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="50%">ITEM & DESCRIPTION</th>
+                                            <th width="15%" style="text-align: center;">QTY</th>
+                                            <th width="15%" style="text-align: right;">RATE</th>
+                                            <th width="20%" style="text-align: right;">AMOUNT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="prev-items-body">
+                                        <!-- Filled by JS -->
+                                    </tbody>
                                 </table>
                             </div>
 
-                            <!-- Signature -->
-                            <div class="signature-box" style="clear: both; padding-top: 40px;">
-                                <img id="prev-signature" src="" style="display: none;">
-                                <div style="width: 150px; border-bottom: 1px solid #9ca3af; margin-left: auto; margin-bottom: 5px;"></div>
-                                <p style="color: #6b7280; text-transform: uppercase;">Authorized Signature</p>
+                            <!-- Totals -->
+                            <div class="inv-totals-container">
+                                <table class="inv-totals">
+                                    <tr><td>Subtotal</td><td id="prev-subtotal">₹0.00</td></tr>
+                                    <tr><td>Sales Tax (<span id="prev-tax-rate">18</span>%)</td><td id="prev-tax-amt">₹0.00</td></tr>
+                                    <tr><td>Discount</td><td id="prev-discount">-₹0.00</td></tr>
+                                    <tr class="grand-total"><td>TOTAL</td><td id="prev-total">₹0.00</td></tr>
+                                </table>
+                            </div>
+
+                            <!-- Bottom (Terms & Signature) -->
+                            <div class="inv-bottom-section">
+                                <div class="inv-notes">
+                                    <h4>TERMS & CONDITIONS</h4>
+                                    <p id="prev-terms"></p>
+                                </div>
+                                <div class="signature-box">
+                                    <img id="prev-signature" src="" style="display: none;">
+                                    <div class="signature-line"></div>
+                                    <p>AUTHORIZED SIGNATURE</p>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="inv-footer">
+                                <span id="prev-biz-contact"></span> &nbsp;|&nbsp; <span id="prev-biz-website"></span>
                             </div>
 
                         </div>
                     </div>
+                    <!-- ============================================================ -->
+                    <!-- 🟢 INVOICE TEMPLATE END -->
+                    <!-- ============================================================ -->
+
                 </div>
             </section>
 
@@ -449,18 +529,16 @@
          ============================================================ -->
     <script>
         // ⚠️ REPLACE THESE WITH YOUR SUPABASE CREDENTIALS
-        const SUPABASE_URL = 'https://gbjyidkfrjdrynezslgy.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_7iKaqbUbGbhsIR5vChiOVg_wpCc6IM1';
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // UI Elements
         const loginScreen = document.getElementById('login-screen');
         const appShell = document.getElementById('app');
         const navItems = document.querySelectorAll('.nav-item[data-target]');
         const viewSections = document.querySelectorAll('.view-section');
 
-        // State
         let currentUser = null;
         let userProfile = null;
         let invoiceItems = [];
@@ -515,8 +593,7 @@
         // === ROUTER ===
         navItems.forEach(item => {
             item.addEventListener('click', () => {
-                const target = item.getAttribute('data-target');
-                window.location.hash = '#' + target;
+                window.location.hash = '#' + item.getAttribute('data-target');
             });
         });
 
@@ -558,9 +635,6 @@
                     document.getElementById('preview-logo').src = data.logo_url;
                     document.getElementById('preview-logo').style.display = 'block';
                     document.getElementById('logo-placeholder').style.display = 'none';
-                    
-                    document.getElementById('prev-logo').src = data.logo_url;
-                    document.getElementById('prev-logo').style.display = 'block';
                 }
                 if (data.signature_url) {
                     document.getElementById('preview-signature').src = data.signature_url;
@@ -571,12 +645,11 @@
                     document.getElementById('prev-signature').style.display = 'block';
                 }
                 
-                // Update A4 Preview Header
+                // Update A4 Preview Header/Footer
                 document.getElementById('prev-biz-name').innerText = data.business_name || 'Business Name';
-                document.getElementById('prev-biz-address').innerText = data.address || '';
+                document.getElementById('prev-terms').innerText = data.default_terms || '';
                 document.getElementById('prev-biz-contact').innerText = data.contact_info || '';
                 document.getElementById('prev-biz-website').innerText = data.website || '';
-                document.getElementById('prev-terms').innerText = data.default_terms || '';
             }
         }
 
@@ -682,8 +755,7 @@
             }
         };
 
-        // Bind meta inputs to preview
-        ['inv-no', 'inv-date', 'inv-client', 'inv-address', 'inv-tax', 'inv-discount'].forEach(id => {
+        ['inv-no', 'inv-date', 'inv-client', 'inv-address', 'inv-tax', 'inv-discount', 'inv-color'].forEach(id => {
             document.getElementById(id).addEventListener('input', updateInvoicePreview);
         });
 
@@ -695,22 +767,41 @@
             document.getElementById('prev-client').innerText = document.getElementById('inv-client').value || 'Client Name';
             document.getElementById('prev-address').innerHTML = document.getElementById('inv-address').value.replace(/\n/g, '<br>');
 
-            // Items
+            // Dynamic Color
+            const color = document.getElementById('inv-color').value;
+            document.getElementById('invoice-preview').style.setProperty('--inv-primary', color);
+
+            // Items & Auto-Fill Empty Rows
             const tbody = document.getElementById('prev-items-body');
             tbody.innerHTML = '';
             let subtotal = 0;
 
+            // Actual items
             invoiceItems.forEach((item, index) => {
                 subtotal += item.rate;
                 tbody.innerHTML += `
                     <tr>
-                        <td style="text-align: center;">${index + 1}</td>
-                        <td><strong>${item.title}</strong><br><span style="color: #6b7280; font-size: 10px;">${item.desc}</span></td>
+                        <td><strong>${item.title}</strong><br><span style="color: var(--inv-muted); font-size: 11px;">${item.desc}</span></td>
+                        <td style="text-align: center;">1</td>
                         <td style="text-align: right;">₹${item.rate.toFixed(2)}</td>
                         <td style="text-align: right;">₹${item.rate.toFixed(2)}</td>
                     </tr>
                 `;
             });
+
+            // Fill empty rows to maintain the full A4 look
+            const minRows = 8;
+            const emptyRowsNeeded = Math.max(0, minRows - invoiceItems.length);
+            for (let i = 0; i < emptyRowsNeeded; i++) {
+                tbody.innerHTML += `
+                    <tr class="empty-row">
+                        <td>&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                `;
+            }
 
             // Calculations
             const taxRate = parseFloat(document.getElementById('inv-tax').value) || 0;
@@ -726,7 +817,7 @@
             document.getElementById('prev-total').innerText = `₹${total.toFixed(2)}`;
         }
 
-        // === SAVE INVOICE TO SUPABASE ===
+        // === SAVE INVOICE ===
         document.getElementById('btn-save-invoice').addEventListener('click', async () => {
             if(!currentUser) return;
             if(invoiceItems.length === 0) return alert("Please add at least one item.");
@@ -763,21 +854,19 @@
                 window.location.hash = '#invoices';
                 loadInvoices();
             }
-            btn.innerText = "Save Invoice to Cloud";
+            btn.innerText = "Save Invoice";
         });
 
-        // === INVOICE HISTORY ===
+        // === INVOICE HISTORY & DASHBOARD ===
         async function loadInvoices() {
             if(!currentUser) return;
             const { data, error } = await sb.from('invoices').select('*').order('created_at', { ascending: false });
             
             if (data) {
-                // Update Dashboard
                 const totalRev = data.reduce((s, inv) => s + Number(inv.total), 0);
                 document.getElementById('dash-revenue').innerText = `₹${totalRev.toFixed(2)}`;
                 document.getElementById('dash-count').innerText = data.length;
 
-                // Update Table
                 const tbody = document.getElementById('invoice-list');
                 tbody.innerHTML = '';
                 
