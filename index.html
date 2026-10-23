@@ -3,912 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flux Invoice Studio</title>
+    <title>ShopSteward | Dashboard</title>
+    
+    <!-- Safe CDNs for Styling and Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- SUPABASE SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         :root {
-            --primary: #059669;
-            --primary-hover: #047857;
-            --paper-bg: #ffffff;
-            --border-invoice: #94a3b8;
-            --text-dark: #1f2937;
-            --text-muted: #6b7280;
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.9);
+            --bg-dark: #0d1117;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            color: var(--text-dark);
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            overflow-x: hidden;
             height: 100vh;
-            overflow: hidden;
-            position: relative;
         }
 
-        /* === BACKGROUND BLOBS (FLUX THEME) === */
-        .bg-blob {
-            position: absolute;
-            filter: blur(100px);
-            z-index: 0;
-            opacity: 0.7;
+        /* Aurora Glowing Blobs */
+        .aurora-blob {
+            position: fixed;
             border-radius: 50%;
-            pointer-events: none;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 12s infinite ease-in-out alternate;
         }
-        .blob-1 { top: -10%; left: 10%; width: 600px; height: 600px; background: radial-gradient(circle, #fef08a, #fde047); }
-        .blob-2 { bottom: -10%; right: 10%; width: 500px; height: 500px; background: radial-gradient(circle, #a7f3d0, #6ee7b7); }
-        .blob-3 { top: 30%; left: 30%; width: 500px; height: 500px; background: radial-gradient(circle, #bfdbfe, #93c5fd); }
+        .blob-purple { top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, #8b5cf6 0%, transparent 70%); }
+        .blob-teal { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, #14b8a6 0%, transparent 70%); animation-delay: -5s; }
+        .blob-pink { top: 40%; left: 40%; width: 40vw; height: 40vw; background: radial-gradient(circle, #ec4899 0%, transparent 70%); opacity: 0.3; }
 
-        /* === LAYOUT === */
-        .app-container {
-            display: flex;
-            height: 100vh;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* === SIDEBAR === */
-        .sidebar {
-            width: 420px;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-right: 1px solid rgba(255, 255, 255, 0.8);
-            display: flex;
-            flex-direction: column;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.03);
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(5%, 5%) scale(1.1); }
         }
 
-        .brand-header {
-            padding: 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .logo-mark {
-            width: 32px;
-            height: 32px;
-            background: #fde047;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            box-shadow: 0 4px 10px rgba(253, 224, 71, 0.4);
-        }
-        .brand-header h2 {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            color: #111827;
-        }
-
-        .scroll-area {
-            padding: 0 25px 40px 25px;
-            overflow-y: auto;
-            flex: 1;
-        }
-        .scroll-area::-webkit-scrollbar { width: 6px; }
-        .scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
-        /* Glass Panels */
+        /* Glassmorphism Utility */
         .glass-panel {
             background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        h3 {
-            font-size: 13px;
-            color: #4b5563;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            transition: border-color 0.3s ease;
         }
 
-        /* Inputs */
-        .input-group { margin-bottom: 12px; }
-        .input-group label { display: block; font-size: 11px; color: #6b7280; margin-bottom: 6px; font-weight: 600; }
-
-        input[type="text"], input[type="number"], input[type="date"], textarea, select {
-            width: 100%;
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            color: #111827;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 13px;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
-        }
-        textarea { resize: vertical; }
-
-        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-        /* Color Picker */
-        input[type="color"] {
-            -webkit-appearance: none; border: none; width: 100%; height: 40px; border-radius: 12px; cursor: pointer; background: transparent; padding: 0;
-        }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: 1px solid #e5e7eb; border-radius: 12px; }
-
-        /* File Upload */
-        .file-upload-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .file-upload { flex: 1; }
-        .file-upload label { display: block; font-size: 11px; color: #6b7280; margin-bottom: 6px; font-weight: 600; }
-        input[type="file"] {
-            width: 100%; font-size: 10px; color: #6b7280; background: #fff;
-            border: 1px dashed #cbd5e1; border-radius: 12px; padding: 8px; cursor: pointer;
-        }
-        input[type="file"]::file-selector-button {
-            border: none; background: #f3f4f6; padding: 4px 8px; border-radius: 6px;
-            color: #374151; font-weight: 600; cursor: pointer; margin-right: 8px;
-        }
-
-        /* Dynamic Items */
-        .panel-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .panel-header-flex h3 { margin-bottom: 0; }
-
-        .btn-pill-add {
-            background: #fef08a; color: #854d0e; border: none;
-            padding: 6px 14px; border-radius: 20px; font-size: 12px;
-            font-weight: 700; cursor: pointer; transition: all 0.2s;
-            box-shadow: 0 2px 10px rgba(253, 224, 71, 0.4);
-        }
-        .btn-pill-add:hover { background: #fde047; transform: scale(1.05); }
-
-        .item-row {
-            background: #ffffff; border: 1px solid #e5e7eb; border-radius: 14px;
-            padding: 12px; margin-bottom: 12px; position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-        .item-row input { margin-bottom: 8px; padding: 8px 12px; }
-        .item-row input:last-child { margin-bottom: 0; }
-        .item-row .remove-item {
-            position: absolute; top: -8px; right: -8px;
-            background: #ef4444; color: white; border: 2px solid white;
-            width: 24px; height: 24px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
-        }
-        .item-row .remove-item:hover { transform: scale(1.1); }
-
-        /* Action Buttons */
-        .action-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 30px; }
-        .btn-row { display: flex; gap: 10px; }
-        
-        button.btn-primary {
-            flex: 2; padding: 14px; background: #111827; color: white;
-            border: none; border-radius: 30px; font-weight: 600; font-size: 14px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(17, 24, 39, 0.3); transition: all 0.2s;
-        }
-        button.btn-primary:hover { background: #374151; transform: translateY(-1px); }
-        
-        button.btn-cloud {
-            width: 100%; padding: 14px; background: #0284c7; color: white;
-            border: none; border-radius: 30px; font-weight: 600; font-size: 14px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3); transition: all 0.2s;
-        }
-        button.btn-cloud:hover { background: #0369a1; transform: translateY(-1px); }
-
-        button.btn-danger {
-            flex: 1; padding: 14px; background: #fee2e2; color: #b91c1c;
-            border: none; border-radius: 30px; font-weight: 600; font-size: 14px; cursor: pointer;
-            transition: all 0.2s;
-        }
-        button.btn-danger:hover { background: #fecaca; }
-
-        /* === PREVIEW AREA (INVOICE) === */
-        .preview-area {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .invoice-paper {
-            width: 210mm; min-height: 297mm; background: var(--paper-bg); color: #1f2937;
-            padding: 15mm; box-shadow: 0 20px 50px rgba(0,0,0,0.1); position: relative;
-            border-radius: 4px;
-        }
-        .inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .inv-brand { display: flex; gap: 15px; align-items: center; }
-        
-        .logo-img { max-width: 120px; max-height: 70px; object-fit: contain; }
-        
-        .brand-text h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; margin-bottom: 4px; color: #111827; }
-        .brand-text p { font-size: 11px; color: #4b5563; line-height: 1.5; }
-        .inv-title h2 { font-family: Georgia, serif; font-size: 28px; color: #111827; letter-spacing: 1px; font-weight: normal; }
-
-        .inv-meta-grid { display: flex; border-top: 1px solid var(--border-invoice); border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); }
-        .meta-box { flex: 1; border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); padding: 12px 15px; }
-        .meta-box:last-child { border-right: none; }
-        .meta-row { display: flex; margin-bottom: 6px; font-size: 12px; }
-        .meta-row:last-child { margin-bottom: 0; }
-        .meta-row span { width: 100px; color: #6b7280; }
-        .meta-row strong { color: #111827; font-weight: 600; }
-
-        .inv-address-grid { display: flex; border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); }
-        .address-box { flex: 1; border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); padding: 12px 15px; }
-        .address-box:last-child { border-right: none; }
-        .address-box h4 { font-size: 10px; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
-        .address-box .client-name { font-weight: 700; color: #b91c1c; font-size: 13px; margin-bottom: 4px; }
-        .address-box p { font-size: 12px; color: #111827; line-height: 1.5; }
-
-        .inv-subject { border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); padding: 10px 15px; font-size: 12px; color: #111827; min-height: 38px; }
-        .inv-subject span:first-child { color: #6b7280; }
-
-        .inv-table { width: 100%; border-collapse: collapse; border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); }
-        .inv-table th { background: #f3f4f6; color: #111827; font-size: 11px; font-weight: 700; padding: 10px; border: 1px solid var(--border-invoice); text-transform: uppercase; }
-        .inv-table td { padding: 12px 10px; border: 1px solid var(--border-invoice); vertical-align: top; font-size: 12px; }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .item-title { font-weight: 700; color: #111827; font-size: 12px; margin-bottom: 2px; }
-        .item-desc { font-size: 11px; color: #6b7280; line-height: 1.4; }
-        .amount-col { font-weight: 600; color: #111827; }
-
-        .inv-footer-grid { display: flex; border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); }
-        .footer-left { flex: 1.2; border-right: 1px solid var(--border-invoice); padding: 12px 15px; display: flex; flex-direction: column; gap: 15px; }
-        .footer-right { flex: 0.8; display: flex; flex-direction: column; }
-        .words-section h4, .terms-section h4 { font-size: 11px; color: #111827; margin-bottom: 4px; font-weight: 700; }
-        .words-text { font-weight: 700; font-size: 12px; color: #111827; font-style: italic; min-height: 18px; }
-        .terms-section p { font-size: 10px; color: #4b5563; line-height: 1.4; min-height: 50px; }
-
-        .totals-table { width: 100%; border-collapse: collapse; }
-        .totals-table td { padding: 8px 15px; font-size: 12px; color: #111827; border-bottom: 1px solid var(--border-invoice); }
-        .totals-table td:first-child { text-align: right; color: #6b7280; }
-        .totals-table td:last-child { text-align: right; font-weight: 600; width: 100px; }
-        .totals-table .grand-total-row td { font-weight: 700; font-size: 14px; border-bottom: none; }
-
-        .signature-area { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 15px; border-top: 1px solid var(--border-invoice); min-height: 100px; }
-        
-        .signature-img { max-width: 150px; max-height: 60px; object-fit: contain; margin-bottom: 5px; }
-        
-        .signature-line { width: 160px; border-bottom: 1px solid #9ca3af; margin-bottom: 6px; }
-        .signature-area p { font-size: 10px; color: #6b7280; text-transform: uppercase; font-weight: 600; }
-
-        /* === PRINT STYLES === */
-        @media print {
-            @page { size: A4; margin: 0; }
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
-            body { background: white; height: auto; overflow: visible; }
-            .sidebar, .bg-blob { display: none !important; }
-            .app-container { display: block; }
-            .preview-area { padding: 0; background: white; overflow: visible; display: block; }
-            .invoice-paper { box-shadow: none; width: 100%; min-height: 100vh; margin: 0; padding: 15mm; border-radius: 0; }
-            .inv-table { page-break-inside: auto; }
-            .inv-table tr { page-break-inside: avoid; page-break-after: auto; }
-            .inv-footer-grid { page-break-inside: avoid; }
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
     </style>
 </head>
-<body>
+<body class="flex">
 
-    <div class="bg-blob blob-1"></div>
-    <div class="bg-blob blob-2"></div>
-    <div class="bg-blob blob-3"></div>
+    <!-- 🌌 Aurora Background Elements -->
+    <div class="aurora-blob blob-purple"></div>
+    <div class="aurora-blob blob-teal"></div>
+    <div class="aurora-blob blob-pink"></div>
 
-    <div class="app-container">
+    <!-- 🧭 Left Sidebar (Glass Pill) -->
+    <aside class="fixed left-6 top-1/2 -translate-y-1/2 z-50">
+        <nav class="glass-panel flex flex-col gap-4 p-3 rounded-full">
+            <div class="w-12 h-12 flex items-center justify-center bg-white/10 rounded-full mb-4 cursor-pointer hover:bg-white/20 transition">
+                <span class="text-xl font-bold">SS</span>
+            </div>
+            <!-- Dashboard (Active) -->
+            <button class="w-12 h-12 flex items-center justify-center bg-indigo-500 rounded-full text-white shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-transform hover:scale-110">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            </button>
+            <!-- Invoices -->
+            <button class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </button>
+            <!-- Expenses -->
+            <button class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </button>
+            <!-- Settings -->
+            <button class="w-12 h-12 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all mt-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+        </nav>
+    </aside>
+
+    <!-- 📊 Main Content Area -->
+    <main class="flex-1 ml-28 p-8 lg:p-10 max-w-[1600px] mx-auto h-screen overflow-y-auto">
         
-        <!-- LEFT SIDEBAR: CONTROL PANEL -->
-        <div class="sidebar">
-            <div class="brand-header">
-                <div class="logo-mark">✦</div>
-                <h2>Invoice Studio</h2>
+        <!-- 🔝 Top Header -->
+        <header class="flex justify-between items-center mb-10">
+            <div class="glass-panel flex items-center px-4 py-3 rounded-2xl w-96">
+                <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" placeholder="Search invoices, clients..." class="bg-transparent border-none outline-none text-sm text-white placeholder-gray-400 w-full">
+                <span class="text-xs text-gray-500 bg-white/10 px-2 py-1 rounded-md">⌘K</span>
             </div>
 
-            <div class="scroll-area">
-                <!-- Business & Branding -->
-                <div class="glass-panel">
-                    <h3>Business Profile</h3>
-                    <div class="input-group">
-                        <label>Business Name</label>
-                        <input type="text" id="biz-name" value="ShopSteward.in">
+            <div class="flex items-center gap-4">
+                <button class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-2xl font-medium text-sm transition-all shadow-[0_0_20px_rgba(79,70,229,0.4)]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Create Invoice
+                </button>
+                <button class="glass-panel w-12 h-12 flex items-center justify-center rounded-2xl text-gray-300 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                </button>
+                <div class="glass-panel p-1 pr-4 rounded-2xl flex items-center gap-3 cursor-pointer">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+                        <span class="text-white font-bold">O</span>
                     </div>
-                    <div class="input-group">
-                        <label>Address</label>
-                        <input type="text" id="biz-address" value="Kutki, infront of Shiva Tample , Medinipur, West Bengal, 721451">
-                    </div>
-                    <div class="input-group">
-                        <label>Contact Info</label>
-                        <input type="text" id="biz-contact" value="shopsteward.in@gmail.com / 8637560557">
-                    </div>
-                    <!-- NEW: WEBSITE FIELD -->
-                    <div class="input-group">
-                        <label>Website</label>
-                        <input type="text" id="biz-website" value="www.shopsteward.in">
-                    </div>
-                    
-                    <div class="file-upload-row">
-                        <div class="file-upload">
-                            <label>Upload Custom Logo</label>
-                            <input type="file" id="logo-upload" accept="image/*">
-                        </div>
-                        <div class="file-upload">
-                            <label>Upload Custom Signature</label>
-                            <input type="file" id="signature-upload" accept="image/*">
-                        </div>
-                    </div>
-                    
-                    <div class="input-group" style="margin-top: 10px;">
-                        <label>Accent Color</label>
-                        <input type="color" id="accent-color" value="#059669">
-                    </div>
-                </div>
-
-                <!-- Client Details -->
-                <div class="glass-panel">
-                    <h3>Client Details</h3>
-                    <div class="input-group">
-                        <label>Billed To</label>
-                        <input type="text" id="client-name" value="">
-                    </div>
-                    <div class="input-group">
-                        <label>Client Address</label>
-                        <textarea id="client-address" rows="2"></textarea>
-                    </div>
-                </div>
-
-                <!-- Invoice Details -->
-                <div class="glass-panel">
-                    <h3>Invoice Metadata</h3>
-                    <div class="grid-2-col">
-                        <div class="input-group">
-                            <label>Invoice No.</label>
-                            <input type="text" id="inv-number" value="">
-                        </div>
-                        <div class="input-group">
-                            <label>Date</label>
-                            <input type="date" id="inv-date">
-                        </div>
-                    </div>
-                    <div class="grid-2-col">
-                        <div class="input-group">
-                            <label>P.O. Number</label>
-                            <input type="text" id="po-number" value="">
-                        </div>
-                        <div class="input-group">
-                            <label>Subject</label>
-                            <input type="text" id="subject-text" value="">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Items (Services) -->
-                <div class="glass-panel">
-                    <div class="panel-header-flex">
-                        <h3>Services & Add-ons</h3>
-                        <button id="add-item-btn" class="btn-pill-add">+ Add</button>
-                    </div>
-                    <div id="items-container"></div>
-                </div>
-
-                <!-- Taxes & Adjustments -->
-                <div class="glass-panel">
-                    <h3>Taxes & Adjustments</h3>
-                    <div class="grid-2-col">
-                        <div class="input-group">
-                            <label>Tax 1 Name</label>
-                            <input type="text" id="tax1-name" value="">
-                        </div>
-                        <div class="input-group">
-                            <label>Tax 1 Rate (%)</label>
-                            <input type="number" id="tax1-rate" value="">
-                        </div>
-                    </div>
-                    <div class="grid-2-col">
-                        <div class="input-group">
-                            <label>Tax 2 Name</label>
-                            <input type="text" id="tax2-name" value="">
-                        </div>
-                        <div class="input-group">
-                            <label>Tax 2 Rate (%)</label>
-                            <input type="number" id="tax2-rate" value="">
-                        </div>
-                    </div>
-                    <div class="input-group" style="margin-top: 10px;">
-                        <label>Flat Discount (₹)</label>
-                        <input type="number" id="discount-amount" value="">
-                    </div>
-                    <div class="input-group" style="margin-top: 10px;">
-                        <label>Paid Amount (₹)</label>
-                        <input type="number" id="paid-amount" value="">
-                    </div>
-                </div>
-
-                <!-- Terms -->
-                <div class="glass-panel">
-                    <h3>Terms & Notes</h3>
-                    <textarea id="terms-text" rows="4"></textarea>
-                </div>
-                
-                <div class="action-buttons">
-                    <button id="save-cloud-btn" class="btn-cloud">☁ Save to Supabase Cloud</button>
-                    <div class="btn-row">
-                        <button id="print-btn" class="btn-primary">Print / Save PDF</button>
-                        <button id="clear-data-btn" class="btn-danger">Clear All</button>
+                    <div>
+                        <p class="text-sm font-semibold">ShopSteward</p>
+                        <p class="text-xs text-gray-400">Owner</p>
                     </div>
                 </div>
             </div>
+        </header>
+
+        <!-- 👋 Welcome -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold font-['Plus_Jakarta_Sans']">Welcome Back, Owner!</h1>
+            <p class="text-gray-400 mt-1 text-sm">Here is your business overview for this month.</p>
         </div>
 
-        <!-- RIGHT SIDE: A4 INVOICE PREVIEW -->
-        <div class="preview-area">
-            <div class="invoice-paper" id="invoice-paper">
-                
-                <!-- Top Header -->
-                <div class="inv-header">
-                    <div class="inv-brand">
-                        
-                        <!-- GITHUB INTEGRATION: This points to logo.png in your folder -->
-                        <img id="preview-logo" src="image/logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
-                        
-                        <div class="brand-text">
-                            <h1 id="preview-biz-name"></h1>
-                            <p id="preview-biz-address"></p>
-                            <p id="preview-biz-contact"></p>
-                            <!-- NEW: WEBSITE PREVIEW -->
-                            <p id="preview-biz-website" style="font-weight: 600; color: var(--primary);"></p>
-                        </div>
-                    </div>
-                    <div class="inv-title">
-                        <h2>TAX INVOICE</h2>
-                    </div>
-                </div>
-
-                <!-- Meta Grid -->
-                <div class="inv-meta-grid">
-                    <div class="meta-box">
-                        <div class="meta-row"><span>#</span><strong id="preview-inv-number"></strong></div>
-                        <div class="meta-row"><span>Invoice Date</span><strong id="preview-inv-date"></strong></div>
-                        <div class="meta-row"><span>Terms</span><strong>Paid on Receipt</strong></div>
-                        <div class="meta-row"><span>P.O.#</span><strong id="preview-po-number"></strong></div>
-                    </div>
-                    <div class="meta-box right-empty"></div>
-                </div>
-
-                <!-- Address Grid -->
-                <div class="inv-address-grid">
-                    <div class="address-box">
-                        <h4>BILL TO</h4>
-                        <p class="client-name" id="preview-client-name"></p>
-                        <p id="preview-client-address"></p>
-                    </div>
-                    <div class="address-box">
-                        <h4>SHIP TO</h4>
-                        <p id="preview-ship-address"></p>
-                    </div>
-                </div>
-
-                <!-- Subject -->
-                <div class="inv-subject">
-                    <span>Subject:</span> <span id="preview-subject-text"></span>
-                </div>
-
-                <!-- Items Table -->
-                <table class="inv-table">
-                    <thead>
-                        <tr>
-                            <th width="5%">#</th>
-                            <th width="45%">Item & Description</th>
-                            <th width="15%" class="text-right">Rate</th>
-                            <th width="10%" class="text-right">Tax %</th>
-                            <th width="10%" class="text-right">Tax</th>
-                            <th width="15%" class="text-right">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody id="preview-table-body"></tbody>
-                </table>
-
-                <!-- Footer Grid -->
-                <div class="inv-footer-grid">
-                    <div class="footer-left">
-                        <div class="words-section">
-                            <h4>Total In Words</h4>
-                            <p id="preview-words" class="words-text"></p>
-                        </div>
-                        <div class="terms-section">
-                            <h4>Terms & Conditions</h4>
-                            <p id="preview-terms"></p>
-                        </div>
-                    </div>
-                    
-                    <div class="footer-right">
-                        <table class="totals-table">
-                            <tr><td>Sub Total</td><td id="preview-subtotal">₹0.00</td></tr>
-                            <tr id="row-tax1"><td id="label-tax1"></td><td id="preview-tax1">₹0.00</td></tr>
-                            <tr id="row-tax2"><td id="label-tax2"></td><td id="preview-tax2">₹0.00</td></tr>
-                            <tr id="row-discount"><td>Discount</td><td id="preview-discount">(-) ₹0.00</td></tr>
-                            
-                            <tr id="row-invoice-total" style="font-weight: bold; border-top: 1px solid var(--border-invoice);"><td>Total</td><td id="preview-invoice-total">₹0.00</td></tr>
-                            <tr id="row-paid" style="display: none;"><td>Paid Amount</td><td id="preview-paid">(-) ₹0.00</td></tr>
-                            
-                            <tr class="grand-total-row"><td>Balance Due</td><td id="preview-grand-total">₹0.00</td></tr>
-                        </table>
-
-                        <div class="signature-area">
-                            <div class="signature-box">
-                                <!-- GITHUB INTEGRATION: This points to signature.png in your folder -->
-                                <img id="preview-signature" src="image/signature.png" alt="Signature" class="signature-img" onerror="this.style.display='none'">
-                            </div>
-                            <div class="signature-line"></div>
-                            <p>Authorized Signature</p>
-                        </div>
-                    </div>
-                </div>
-
+        <!-- 🍱 EMPTY BENTO GRID CONTAINER -->
+        <!-- Block 2 will be inserted inside this div -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="glass-panel rounded-3xl p-6 h-64 flex items-center justify-center border-dashed border-2 border-white/10 md:col-span-1">
+                <p class="text-gray-500">Card 1: Total Revenue (Block 2)</p>
             </div>
+            
+            <div class="glass-panel rounded-3xl p-6 h-64 flex items-center justify-center border-dashed border-2 border-white/10 md:col-span-2">
+                <p class="text-gray-500">Card 2: Revenue Chart (Block 2)</p>
+            </div>
+
         </div>
+    </main>
 
-    </div>
-
-    <script>
-        // ==========================================
-        // 1. SUPABASE CONFIGURATION (PASTE YOURS HERE)
-        // ==========================================
-        const SUPABASE_URL = 'https://gbjyidkfrjdrynezslgy.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'sb_publishable_7iKaqbUbGbhsIR5vChiOVg_wpCc6IM1';
-        
-        // Initialize Supabase
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            let items = [];
-
-            const itemsContainer = document.getElementById('items-container');
-            const addItemBtn = document.getElementById('add-item-btn');
-            const accentColorInput = document.getElementById('accent-color');
-            
-            // Bumped to v9 to clear old cached data and load the website field
-            const STORAGE_KEY = 'invoice_data_blank_v9';
-            const LOGO_KEY = 'invoice_logo_blank_v9';
-            const SIG_KEY = 'invoice_signature_blank_v9';
-            const ACCENT_KEY = 'invoice_accent_blank_v9';
-
-            const inputsToTrack = [
-                'biz-name', 'biz-address', 'biz-contact', 'biz-website', 'client-name', 'client-address', 
-                'inv-number', 'inv-date', 'po-number', 'subject-text',
-                'tax1-name', 'tax1-rate', 'tax2-name', 'tax2-rate', 
-                'discount-amount', 'paid-amount', 'terms-text'
-            ];
-
-            function numberToWords(num) {
-                if (num === 0) return 'Indian Rupee Zero Only';
-                const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
-                const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
-                function inWords(n) {
-                    if (n < 20) return a[n];
-                    if (n < 100) return b[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + a[n % 10] : ' ');
-                    if (n < 1000) return a[Math.floor(n / 100)] + 'Hundred ' + (n % 100 !== 0 ? inWords(n % 100) : '');
-                    if (n < 100000) return inWords(Math.floor(n / 1000)) + 'Thousand ' + (n % 1000 !== 0 ? inWords(n % 1000) : '');
-                    if (n < 10000000) return inWords(Math.floor(n / 100000)) + 'Lakh ' + (n % 100000 !== 0 ? inWords(n % 100000) : '');
-                    return inWords(Math.floor(n / 10000000)) + 'Crore ' + (n % 10000000 !== 0 ? inWords(n % 10000000) : '');
-                }
-
-                let str = inWords(Math.floor(num)).trim();
-                let paise = Math.round((num - Math.floor(num)) * 100);
-                let result = "Indian Rupee " + str;
-                if (paise > 0) { result += " and " + inWords(paise).trim() + " Paise"; }
-                return result + " Only";
-            }
-
-            function formatCurrency(amount) { return '₹' + amount.toFixed(2); }
-
-            function renderSidebarItems() {
-                itemsContainer.innerHTML = '';
-                items.forEach((item) => {
-                    const div = document.createElement('div');
-                    div.className = 'item-row';
-                    div.innerHTML = `
-                        <button class="remove-item" data-id="${item.id}">×</button>
-                        <input type="text" class="item-title-input" data-id="${item.id}" placeholder="Service Title" value="${item.title}">
-                        <input type="text" class="item-desc-input" data-id="${item.id}" placeholder="Description" value="${item.desc}">
-                        <input type="number" class="item-rate-input" data-id="${item.id}" placeholder="Rate (₹)" value="${item.rate}">
-                    `;
-                    itemsContainer.appendChild(div);
-                });
-            }
-
-            itemsContainer.addEventListener('input', (e) => {
-                const id = e.target.dataset.id;
-                if (!id) return;
-                const item = items.find(i => i.id === id);
-                if (!item) return;
-
-                if (e.target.classList.contains('item-title-input')) item.title = e.target.value;
-                if (e.target.classList.contains('item-desc-input')) item.desc = e.target.value;
-                if (e.target.classList.contains('item-rate-input')) item.rate = parseFloat(e.target.value) || 0;
-
-                updatePreview();
-            });
-
-            itemsContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('remove-item')) {
-                    const id = e.target.dataset.id;
-                    items = items.filter(i => i.id !== id);
-                    renderSidebarItems();
-                    updatePreview();
-                }
-            });
-
-            function updatePreview() {
-                document.getElementById('preview-biz-name').innerText = document.getElementById('biz-name').value;
-                document.getElementById('preview-biz-address').innerText = document.getElementById('biz-address').value;
-                document.getElementById('preview-biz-contact').innerText = document.getElementById('biz-contact').value;
-                
-                // NEW: UPDATE WEBSITE
-                document.getElementById('preview-biz-website').innerText = document.getElementById('biz-website').value;
-
-                document.getElementById('preview-client-name').innerText = document.getElementById('client-name').value;
-                document.getElementById('preview-client-address').innerHTML = document.getElementById('client-address').value.replace(/\n/g, '<br>');
-                document.getElementById('preview-ship-address').innerHTML = document.getElementById('client-address').value.replace(/\n/g, '<br>');
-                
-                document.getElementById('preview-inv-number').innerText = document.getElementById('inv-number').value;
-                document.getElementById('preview-po-number').innerText = document.getElementById('po-number').value;
-                document.getElementById('preview-subject-text').innerText = document.getElementById('subject-text').value;
-                
-                const dateVal = document.getElementById('inv-date').value;
-                document.getElementById('preview-inv-date').innerText = dateVal ? new Date(dateVal).toLocaleDateString('en-GB') : '';
-
-                document.getElementById('preview-terms').innerText = document.getElementById('terms-text').value;
-
-                const tableBody = document.getElementById('preview-table-body');
-                tableBody.innerHTML = '';
-                let subtotal = 0;
-                let totalTax = 0;
-
-                const tax1Rate = parseFloat(document.getElementById('tax1-rate').value) || 0;
-                const tax2Rate = parseFloat(document.getElementById('tax2-rate').value) || 0;
-                const totalTaxRate = tax1Rate + tax2Rate;
-
-                items.forEach((item, index) => {
-                    const itemTax = item.rate * (totalTaxRate / 100);
-                    subtotal += item.rate;
-                    totalTax += itemTax;
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="text-center">${index + 1}</td>
-                        <td>
-                            <div class="item-title">${item.title}</div>
-                            <div class="item-desc">${item.desc}</div>
-                        </td>
-                        <td class="text-right">${formatCurrency(item.rate)}</td>
-                        <td class="text-right">${totalTaxRate > 0 ? totalTaxRate + '%' : ''}</td>
-                        <td class="text-right">${totalTaxRate > 0 ? formatCurrency(itemTax) : ''}</td>
-                        <td class="text-right amount-col">${formatCurrency(item.rate + itemTax)}</td>
-                    `;
-                    tableBody.appendChild(tr);
-                });
-
-                const tax1Name = document.getElementById('tax1-name').value;
-                const tax2Name = document.getElementById('tax2-name').value;
-                
-                const tax1Amount = subtotal * (tax1Rate / 100);
-                const tax2Amount = subtotal * (tax2Rate / 100);
-                
-                const discountAmount = parseFloat(document.getElementById('discount-amount').value) || 0;
-                const paidAmount = parseFloat(document.getElementById('paid-amount').value) || 0;
-                
-                const invoiceTotal = subtotal + tax1Amount + tax2Amount - discountAmount;
-                const balanceDue = invoiceTotal - paidAmount;
-
-                document.getElementById('preview-subtotal').innerText = formatCurrency(subtotal);
-                document.getElementById('preview-invoice-total').innerText = formatCurrency(invoiceTotal);
-                
-                if(tax1Rate > 0 && tax1Name) {
-                    document.getElementById('row-tax1').style.display = 'table-row';
-                    document.getElementById('label-tax1').innerText = `${tax1Name} (${tax1Rate}%)`;
-                    document.getElementById('preview-tax1').innerText = formatCurrency(tax1Amount);
-                } else { document.getElementById('row-tax1').style.display = 'none'; }
-
-                if(tax2Rate > 0 && tax2Name) {
-                    document.getElementById('row-tax2').style.display = 'table-row';
-                    document.getElementById('label-tax2').innerText = `${tax2Name} (${tax2Rate}%)`;
-                    document.getElementById('preview-tax2').innerText = formatCurrency(tax2Amount);
-                } else { document.getElementById('row-tax2').style.display = 'none'; }
-
-                if(discountAmount > 0) {
-                    document.getElementById('row-discount').style.display = 'table-row';
-                    document.getElementById('preview-discount').innerText = `(-) ${formatCurrency(discountAmount)}`;
-                } else { document.getElementById('row-discount').style.display = 'none'; }
-
-                if(paidAmount > 0) {
-                    document.getElementById('row-paid').style.display = 'table-row';
-                    document.getElementById('preview-paid').innerText = `(-) ${formatCurrency(paidAmount)}`;
-                } else { 
-                    document.getElementById('row-paid').style.display = 'none'; 
-                }
-
-                document.getElementById('preview-grand-total').innerText = formatCurrency(balanceDue);
-                document.getElementById('preview-words').innerText = numberToWords(balanceDue);
-
-                saveData();
-            }
-
-            document.getElementById('logo-upload').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const img = document.getElementById('preview-logo');
-                        img.src = event.target.result;
-                        img.style.display = 'block';
-                        localStorage.setItem(LOGO_KEY, event.target.result);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            document.getElementById('signature-upload').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const img = document.getElementById('preview-signature');
-                        img.src = event.target.result;
-                        img.style.display = 'block';
-                        localStorage.setItem(SIG_KEY, event.target.result);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            accentColorInput.addEventListener('input', (e) => {
-                const color = e.target.value;
-                document.documentElement.style.setProperty('--primary', color);
-                document.documentElement.style.setProperty('--primary-hover', color + 'cc'); 
-                localStorage.setItem(ACCENT_KEY, color);
-            });
-
-            function saveData() {
-                const data = { items: items, fields: {} };
-                inputsToTrack.forEach(id => { data.fields[id] = document.getElementById(id).value; });
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            }
-
-            // ==========================================
-            // 2. SUPABASE SAVE TO CLOUD FUNCTION
-            // ==========================================
-            document.getElementById('save-cloud-btn').addEventListener('click', async () => {
-                const btn = document.getElementById('save-cloud-btn');
-                const originalText = btn.innerText;
-                btn.innerText = 'Saving...';
-                btn.disabled = true;
-
-                const invNumber = document.getElementById('inv-number').value;
-                const clientName = document.getElementById('client-name').value;
-
-                if(!invNumber || !clientName) {
-                    alert("Please enter at least an Invoice Number and Client Name before saving.");
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                    return;
-                }
-
-                // Prepare the data object to send to Supabase
-                const invoiceDataToSave = {
-                    invoice_number: invNumber,
-                    client_name: clientName,
-                    invoice_data: {
-                        items: items,
-                        fields: {}
-                    }
-                };
-
-                // Collect all field values
-                inputsToTrack.forEach(id => { 
-                    invoiceDataToSave.invoice_data.fields[id] = document.getElementById(id).value; 
-                });
-
-                // Send to Supabase
-                const { data, error } = await supabaseClient
-                    .from('invoices')
-                    .insert([invoiceDataToSave]);
-
-                if (error) {
-                    console.error("Error saving to Supabase:", error);
-                    alert("Failed to save to Cloud: " + error.message);
-                } else {
-                    alert("✅ Invoice saved to Supabase Cloud successfully!");
-                }
-
-                btn.innerText = originalText;
-                btn.disabled = false;
-            });
-
-            function loadData() {
-                const savedData = localStorage.getItem(STORAGE_KEY);
-                
-                function generateId() {
-                    return 'srv-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-                }
-
-                if (savedData) {
-                    const data = JSON.parse(savedData);
-                    if(data.items) items = data.items;
-                    if(data.fields) {
-                        Object.keys(data.fields).forEach(key => {
-                            const el = document.getElementById(key);
-                            if(el) el.value = data.fields[key];
-                        });
-                    }
-                }
-
-                addItemBtn.addEventListener('click', () => {
-                    items.push({ 
-                        id: generateId(), 
-                        title: "", 
-                        desc: "", 
-                        rate: "" 
-                    });
-                    renderSidebarItems();
-                    updatePreview();
-                    document.querySelector('.scroll-area').scrollTop = document.querySelector('.scroll-area').scrollHeight;
-                });
-
-                const savedLogo = localStorage.getItem(LOGO_KEY);
-                if(savedLogo) {
-                    const img = document.getElementById('preview-logo');
-                    img.src = savedLogo;
-                    img.style.display = 'block';
-                }
-                
-                const savedSig = localStorage.getItem(SIG_KEY);
-                if(savedSig) {
-                    const img = document.getElementById('preview-signature');
-                    img.src = savedSig;
-                    img.style.display = 'block';
-                }
-                
-                const savedAccent = localStorage.getItem(ACCENT_KEY);
-                if(savedAccent) {
-                    document.documentElement.style.setProperty('--primary', savedAccent);
-                    accentColorInput.value = savedAccent;
-                }
-                
-                renderSidebarItems();
-                updatePreview();
-            }
-
-            inputsToTrack.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('input', updatePreview);
-            });
-
-            document.getElementById('print-btn').addEventListener('click', () => { window.print(); });
-
-            document.getElementById('clear-data-btn').addEventListener('click', () => {
-                if(confirm("Are you sure you want to reset all data? This will revert to your default GitHub logo and signature.")) { 
-                    localStorage.removeItem(STORAGE_KEY);
-                    localStorage.removeItem(LOGO_KEY);
-                    localStorage.removeItem(SIG_KEY);
-                    localStorage.removeItem(ACCENT_KEY);
-                    location.reload(); 
-                }
-            });
-
-            loadData();
-        });
-    </script>
 </body>
 </html>
