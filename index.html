@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopSteward Invoice Tool</title>
+    <style>
+        :root {
+            --border-color: #999;
+            --text-color: #333;
+            --bg-gray: #f4f5f7;
+            --primary-green: #3b9c5e;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-gray);
+            font-family: var(--font-family);
+            color: var(--text-color);
+            font-size: 13px;
+        }
+
+        /* Top Action Bar */
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-save {
+            background-color: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        .btn-close {
+            color: #d9534f;
+            font-size: 18px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0 10px;
+        }
+
+        /* Invoice Container (A4 Style) */
+        .invoice-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .invoice-paper {
+            width: 800px;
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .company-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .logo-placeholder {
+            width: 90px;
+            height: 90px;
+            /* Placeholder for the green key logo */
+            background-color: #b8e986;
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 10px;
+            text-align: center;
+        }
+
+        .company-details h1 {
+            font-size: 18px;
+            margin: 0 0 5px 0;
+            font-family: Georgia, serif;
+        }
+
+        .company-details p {
+            margin: 2px 0;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .invoice-title {
+            font-family: Georgia, serif;
+            font-size: 26px;
+            font-weight: normal;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        /* Editable styling */
+        [contenteditable="true"] {
+            outline: none;
+            min-width: 20px;
+            display: inline-block;
+        }
+        [contenteditable="true"]:hover {
+            background-color: #f9f9f9;
+            box-shadow: 0 0 2px rgba(0,0,0,0.1);
+        }
+        [contenteditable="true"]:focus {
+            background-color: #eef5ff;
+            box-shadow: 0 0 3px rgba(0,100,255,0.3);
+        }
+
+        /* Details Section */
+        .details-section {
+            display: flex;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .details-left {
+            flex: 1;
+            padding: 10px 0;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .details-right {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 4px;
+        }
+
+        .detail-label {
+            width: 100px;
+            color: #666;
+        }
+        
+        .detail-sep {
+            width: 10px;
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        /* Address Section */
+        .address-section {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .address-box {
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .address-box:first-child {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .address-title {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .address-content {
+            font-size: 12px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        /* Subject / Description */
+        .subject-section {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .subject-row {
+            margin-bottom: 8px;
+        }
+        .subject-row:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            font-weight: bold;
+            color: #333;
+        }
+        
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .col-num { width: 30px; text-align: center; }
+        .col-desc { width: 40%; }
+        .col-qty { width: 60px; text-align: right; }
+        .col-rate { width: 70px; text-align: right; }
+        .col-disc { width: 70px; text-align: right; }
+        .col-taxp { width: 60px; text-align: right; }
+        .col-tax { width: 70px; text-align: right; }
+        .col-amt { width: 80px; text-align: right; }
+
+        .item-desc-title {
+            font-weight: bold;
+        }
+        .item-desc-sub {
+            color: #555;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        /* Footer Section */
+        .footer-section {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .footer-left {
+            flex: 1.2;
+            padding: 10px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .footer-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-block {
+            margin-bottom: 15px;
+        }
+
+        .footer-label {
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .footer-content {
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .totals-table {
+            width: 100%;
+            font-size: 12px;
+        }
+
+        .totals-table td {
+            border: none;
+            border-bottom: 1px solid transparent;
+            padding: 4px 10px;
+            text-align: right;
+        }
+        
+        .totals-table td:first-child {
+            text-align: right;
+            font-weight: bold;
+            padding-right: 20px;
+        }
+
+        .totals-row-bold td {
+            font-weight: bold;
+        }
+
+        .balance-due td {
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: bold;
+            font-size: 13px;
+            padding: 8px 10px;
+        }
+
+        /* Signature */
+        .signature-section {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            min-height: 80px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .signature-box {
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Top Action Bar -->
+    <div class="top-bar">
+        <button class="btn" onclick="alert('Refresh functionality not implemented yet.')">↻ Refresh Preview</button>
+        <button class="btn btn-save" onclick="alert('Save functionality not implemented yet.')">Save</button>
+        <button class="btn-close" onclick="alert('Close clicked')">✕</button>
+    </div>
+
+    <!-- Invoice Canvas -->
+    <div class="invoice-wrapper">
+        <div class="invoice-paper">
+            
+            <!-- Header -->
+            <div class="header">
+                <div class="company-info">
+                    <div class="logo-placeholder">LOGO</div>
+                    <div class="company-details">
+                        <h1 contenteditable="true">ShopSteward</h1>
+                        <p contenteditable="true">West Bengal 721451</p>
+                        <p contenteditable="true">India</p>
+                        <p contenteditable="true">91-8637560557</p>
+                        <p contenteditable="true">shopsteward.in@gmail.com</p>
+                        <p contenteditable="true">www.shopsteward.in</p>
+                    </div>
+                </div>
+                <h2 class="invoice-title">TAX INVOICE</h2>
+            </div>
+
+            <!-- Details -->
+            <div class="details-section">
+                <div class="details-left">
+                    <div class="detail-row">
+                        <span class="detail-label">#</span>
+                        <span class="detail-sep">:</span>
+                        <span class="detail-value" contenteditable="true">INV-17</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Invoice Date</span>
+                        <span class="detail-sep">:</span>
+                        <span class="detail-value" contenteditable="true">22/10/2026</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Terms</span>
+                        <span class="detail-sep">:</span>
+                        <span class="detail-value" contenteditable="true">Due on Receipt</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Due Date</span>
+                        <span class="detail-sep">:</span>
+                        <span class="detail-value" contenteditable="true">22/10/2026</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">P.O.#</span>
+                        <span class="detail-sep">:</span>
+                        <span class="detail-value" contenteditable="true">SO-17</span>
+                    </div>
+                </div>
+                <div class="details-right">
+                    <!-- Empty as per reference -->
+                </div>
+            </div>
+
+            <!-- Addresses -->
+            <div class="address-section">
+                <div class="address-box">
+                    <div class="address-title">Bill To</div>
+                    <div class="address-content">
+                        <div contenteditable="true" style="font-weight: bold; color: #b30000; margin-bottom: 2px;">Rob & Joe Traders</div>
+                        <div contenteditable="true">34, Richie Street</div>
+                        <div contenteditable="true">Chennai</div>
+                        <div contenteditable="true">631603 Tamil Nadu</div>
+                        <div contenteditable="true">India</div>
+                    </div>
+                </div>
+                <div class="address-box">
+                    <div class="address-title">Ship To</div>
+                    <div class="address-content">
+                        <div contenteditable="true">34, Richie Street</div>
+                        <div contenteditable="true">Chennai</div>
+                        <div contenteditable="true">631603 Tamil Nadu</div>
+                        <div contenteditable="true">India</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject / Description -->
+            <div class="subject-section">
+                <div class="subject-row">
+                    <span style="color: #666;">Subject :</span>
+                    <span contenteditable="true" style="min-width: 200px;"></span>
+                </div>
+                <div class="subject-row">
+                    <span style="color: #666;">Description</span>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-num">#</th>
+                        <th class="col-desc">Item & Description</th>
+                        <th class="col-qty">Qty</th>
+                        <th class="col-rate">Rate</th>
+                        <th class="col-disc">Discount</th>
+                        <th class="col-taxp">Tax %</th>
+                        <th class="col-tax">Tax</th>
+                        <th class="col-amt">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="col-num" contenteditable="true">1</td>
+                        <td class="col-desc">
+                            <div class="item-desc-title" contenteditable="true">Brochure Design</div>
+                            <div class="item-desc-sub" contenteditable="true">Brochure Design Single Sided Color</div>
+                        </td>
+                        <td class="col-qty">
+                            <div contenteditable="true">1.00</div>
+                            <div style="font-size: 10px; color: #666;">Nos</div>
+                        </td>
+                        <td class="col-rate" contenteditable="true">300.00</td>
+                        <td class="col-disc" contenteditable="true">0.00</td>
+                        <td class="col-taxp" contenteditable="true">7.00%</td>
+                        <td class="col-tax" contenteditable="true">21.00</td>
+                        <td class="col-amt" contenteditable="true">300.00</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num" contenteditable="true">2</td>
+                        <td class="col-desc">
+                            <div class="item-desc-title" contenteditable="true">Web Design Packages(Template) - Basic</div>
+                            <div class="item-desc-sub" contenteditable="true">Custom Themes for your business.<br>Inclusive of 10 hours of marketing and annual training</div>
+                        </td>
+                        <td class="col-qty">
+                            <div contenteditable="true">1.00</div>
+                            <div style="font-size: 10px; color: #666;">Nos</div>
+                        </td>
+                        <td class="col-rate" contenteditable="true">250.00</td>
+                        <td class="col-disc" contenteditable="true">0.00</td>
+                        <td class="col-taxp" contenteditable="true">4.70%</td>
+                        <td class="col-tax" contenteditable="true">11.75</td>
+                        <td class="col-amt" contenteditable="true">250.00</td>
+                    </tr>
+                    <tr>
+                        <td class="col-num" contenteditable="true">3</td>
+                        <td class="col-desc">
+                            <div class="item-desc-title" contenteditable="true">Print Ad - Basic - Color</div>
+                            <div class="item-desc-sub" contenteditable="true">Print Ad 1/8 size Color</div>
+                        </td>
+                        <td class="col-qty">
+                            <div contenteditable="true">1.00</div>
+                            <div style="font-size: 10px; color: #666;">Nos</div>
+                        </td>
+                        <td class="col-rate" contenteditable="true">80.00</td>
+                        <td class="col-disc" contenteditable="true">0.00</td>
+                        <td class="col-taxp" contenteditable="true"></td>
+                        <td class="col-tax" contenteditable="true"></td>
+                        <td class="col-amt" contenteditable="true">80.00</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Footer -->
+            <div class="footer-section">
+                
+                <!-- Left Side -->
+                <div class="footer-left">
+                    <div class="footer-block">
+                        <div class="footer-label">Total In Words</div>
+                        <div class="footer-content" style="font-style: italic; font-weight: bold;" contenteditable="true">
+                            Indian Rupee Six Hundred Sixty-Two and Seventy-Five Paise Only
+                        </div>
+                    </div>
+                    
+                    <div class="footer-block">
+                        <div class="footer-label">Notes</div>
+                        <div class="footer-content" contenteditable="true">Thanks for your business.</div>
+                    </div>
+
+                    <div class="footer-block">
+                        <div class="footer-label">Payment Options</div>
+                        <div class="footer-content">
+                            <span style="background: #003087; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-style: italic; font-size: 10px;">PayPal</span>
+                            <span style="background: #000; color: #fff; padding: 2px 6px; border-radius: 2px; font-size: 10px; display: inline-block; margin-left: 5px;">
+                                <span style="color: #eb001b;">●</span><span style="color: #f79e1b;">●</span> Mastercard
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="footer-block">
+                        <div class="footer-label">Terms & Conditions</div>
+                        <div class="footer-content" style="color: #444;" contenteditable="true">
+                            This service is subject to an annual subscription fee of ₹599. The first year's subscription is included in the invoice amount. From the second year onward, the client must pay ₹599 per year to continue the service. By paying the invoice amount, the client acknowledges and voluntarily agrees to these subscription terms.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side -->
+                <div class="footer-right">
+                    <table class="totals-table">
+                        <tr>
+                            <td>Sub Total</td>
+                            <td contenteditable="true">630.00</td>
+                        </tr>
+                        <tr>
+                            <td>Sample Tax1 (4.70%)</td>
+                            <td contenteditable="true">11.75</td>
+                        </tr>
+                        <tr>
+                            <td>Sample Tax2 (7.00%)</td>
+                            <td contenteditable="true">21.00</td>
+                        </tr>
+                        <tr class="totals-row-bold">
+                            <td>Total</td>
+                            <td contenteditable="true">₹662.75</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Retention</td>
+                            <td style="color: #d9534f;" contenteditable="true">(-) 10.00</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Made</td>
+                            <td style="color: #d9534f;" contenteditable="true">(-) 100.00</td>
+                        </tr>
+                        <tr class="balance-due">
+                            <td>Balance Due</td>
+                            <td contenteditable="true">₹562.75</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="signature-section">
+                        <div class="signature-box" contenteditable="true">
+                            Authorized Signature
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
