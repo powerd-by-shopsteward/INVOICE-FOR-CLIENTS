@@ -237,7 +237,7 @@
         .address-box .client-name { font-weight: 700; color: #b91c1c; font-size: 13px; margin-bottom: 4px; }
         .address-box p { font-size: 12px; color: #111827; line-height: 1.5; }
 
-        .inv-subject { border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); padding: 10px 15px; font-size: 12px; color: #111827; }
+        .inv-subject { border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); padding: 10px 15px; font-size: 12px; color: #111827; min-height: 38px; }
         .inv-subject span:first-child { color: #6b7280; }
 
         .inv-table { width: 100%; border-collapse: collapse; }
@@ -253,8 +253,8 @@
         .footer-left { flex: 1.2; border-right: 1px solid var(--border-invoice); padding: 12px 15px; display: flex; flex-direction: column; gap: 15px; }
         .footer-right { flex: 0.8; display: flex; flex-direction: column; }
         .words-section h4, .terms-section h4 { font-size: 11px; color: #111827; margin-bottom: 4px; font-weight: 700; }
-        .words-text { font-weight: 700; font-size: 12px; color: #111827; font-style: italic; }
-        .terms-section p { font-size: 10px; color: #4b5563; line-height: 1.4; }
+        .words-text { font-weight: 700; font-size: 12px; color: #111827; font-style: italic; min-height: 18px; }
+        .terms-section p { font-size: 10px; color: #4b5563; line-height: 1.4; min-height: 50px; }
 
         .totals-table { width: 100%; border-collapse: collapse; }
         .totals-table td { padding: 8px 15px; font-size: 12px; color: #111827; border-bottom: 1px solid var(--border-invoice); }
@@ -303,15 +303,15 @@
                     <h3>Business Profile</h3>
                     <div class="input-group">
                         <label>Business Name</label>
-                        <input type="text" id="biz-name" value="ShopSteward">
+                        <input type="text" id="biz-name" value="">
                     </div>
                     <div class="input-group">
                         <label>Address</label>
-                        <input type="text" id="biz-address" value="West Bengal 721451, India">
+                        <input type="text" id="biz-address" value="">
                     </div>
                     <div class="input-group">
                         <label>Contact Info</label>
-                        <input type="text" id="biz-contact" value="91-8637560557 | shopsteward.in@gmail.com">
+                        <input type="text" id="biz-contact" value="">
                     </div>
                     
                     <div class="file-upload-row">
@@ -336,12 +336,11 @@
                     <h3>Client Details</h3>
                     <div class="input-group">
                         <label>Billed To</label>
-                        <input type="text" id="client-name" value="Rob & Joe Traders">
+                        <input type="text" id="client-name" value="">
                     </div>
                     <div class="input-group">
                         <label>Client Address</label>
-                        <textarea id="client-address" rows="2">34, Richie Street, Chennai
-631603 Tamil Nadu, India</textarea>
+                        <textarea id="client-address" rows="2"></textarea>
                     </div>
                 </div>
 
@@ -351,7 +350,7 @@
                     <div class="grid-2-col">
                         <div class="input-group">
                             <label>Invoice No.</label>
-                            <input type="text" id="inv-number" value="INV-101">
+                            <input type="text" id="inv-number" value="">
                         </div>
                         <div class="input-group">
                             <label>Date</label>
@@ -361,11 +360,11 @@
                     <div class="grid-2-col">
                         <div class="input-group">
                             <label>P.O. Number</label>
-                            <input type="text" id="po-number" value="SO-17">
+                            <input type="text" id="po-number" value="">
                         </div>
                         <div class="input-group">
                             <label>Subject</label>
-                            <input type="text" id="subject-text" value="Website Design & Development">
+                            <input type="text" id="subject-text" value="">
                         </div>
                     </div>
                 </div>
@@ -387,38 +386,38 @@
                     <div class="grid-2-col">
                         <div class="input-group">
                             <label>Tax 1 Name</label>
-                            <input type="text" id="tax1-name" value="CGST">
+                            <input type="text" id="tax1-name" value="">
                         </div>
                         <div class="input-group">
                             <label>Tax 1 Rate (%)</label>
-                            <input type="number" id="tax1-rate" value="9">
+                            <input type="number" id="tax1-rate" value="">
                         </div>
                     </div>
                     <div class="grid-2-col">
                         <div class="input-group">
                             <label>Tax 2 Name</label>
-                            <input type="text" id="tax2-name" value="SGST">
+                            <input type="text" id="tax2-name" value="">
                         </div>
                         <div class="input-group">
                             <label>Tax 2 Rate (%)</label>
-                            <input type="number" id="tax2-rate" value="9">
+                            <input type="number" id="tax2-rate" value="">
                         </div>
                     </div>
                     <div class="input-group" style="margin-top: 10px;">
                         <label>Flat Discount (₹)</label>
-                        <input type="number" id="discount-amount" value="0">
+                        <input type="number" id="discount-amount" value="">
                     </div>
                 </div>
 
                 <!-- Terms -->
                 <div class="glass-panel">
                     <h3>Terms & Notes</h3>
-                    <textarea id="terms-text" rows="4">This service is subject to an annual subscription fee of ₹599. The first year's subscription is included in the invoice amount. From the second year onward, the client must pay ₹599 per year to continue the service.</textarea>
+                    <textarea id="terms-text" rows="4"></textarea>
                 </div>
                 
                 <div class="action-buttons">
                     <button id="print-btn" class="btn-primary">Print / Save PDF</button>
-                    <button id="clear-data-btn" class="btn-danger">Reset Data</button>
+                    <button id="clear-data-btn" class="btn-danger">Clear All</button>
                 </div>
             </div>
         </div>
@@ -431,11 +430,11 @@
                 <div class="inv-header">
                     <div class="inv-brand">
                         <img id="preview-logo" src="" alt="Logo" class="logo-img" style="display: none;">
-                        <div id="logo-fallback" class="logo-fallback">ShopSteward</div>
+                        <div id="logo-fallback" class="logo-fallback"></div>
                         <div class="brand-text">
-                            <h1 id="preview-biz-name">ShopSteward</h1>
-                            <p id="preview-biz-address">West Bengal 721451, India</p>
-                            <p id="preview-biz-contact">91-8637560557 | shopsteward.in@gmail.com</p>
+                            <h1 id="preview-biz-name"></h1>
+                            <p id="preview-biz-address"></p>
+                            <p id="preview-biz-contact"></p>
                         </div>
                     </div>
                     <div class="inv-title">
@@ -446,10 +445,10 @@
                 <!-- Meta Grid -->
                 <div class="inv-meta-grid">
                     <div class="meta-box">
-                        <div class="meta-row"><span>#</span><strong id="preview-inv-number">INV-101</strong></div>
-                        <div class="meta-row"><span>Invoice Date</span><strong id="preview-inv-date">-</strong></div>
+                        <div class="meta-row"><span>#</span><strong id="preview-inv-number"></strong></div>
+                        <div class="meta-row"><span>Invoice Date</span><strong id="preview-inv-date"></strong></div>
                         <div class="meta-row"><span>Terms</span><strong>Due on Receipt</strong></div>
-                        <div class="meta-row"><span>P.O.#</span><strong id="preview-po-number">SO-17</strong></div>
+                        <div class="meta-row"><span>P.O.#</span><strong id="preview-po-number"></strong></div>
                     </div>
                     <div class="meta-box right-empty"></div>
                 </div>
@@ -458,18 +457,18 @@
                 <div class="inv-address-grid">
                     <div class="address-box">
                         <h4>BILL TO</h4>
-                        <p class="client-name" id="preview-client-name">Rob & Joe Traders</p>
-                        <p id="preview-client-address">34, Richie Street, Chennai<br>631603 Tamil Nadu, India</p>
+                        <p class="client-name" id="preview-client-name"></p>
+                        <p id="preview-client-address"></p>
                     </div>
                     <div class="address-box">
                         <h4>SHIP TO</h4>
-                        <p id="preview-ship-address">34, Richie Street, Chennai<br>631603 Tamil Nadu, India</p>
+                        <p id="preview-ship-address"></p>
                     </div>
                 </div>
 
                 <!-- Subject -->
                 <div class="inv-subject">
-                    <span>Subject:</span> <span id="preview-subject-text">Website Design & Development</span>
+                    <span>Subject:</span> <span id="preview-subject-text"></span>
                 </div>
 
                 <!-- Items Table -->
@@ -492,19 +491,19 @@
                     <div class="footer-left">
                         <div class="words-section">
                             <h4>Total In Words</h4>
-                            <p id="preview-words" class="words-text">Indian Rupee Zero Only</p>
+                            <p id="preview-words" class="words-text"></p>
                         </div>
                         <div class="terms-section">
                             <h4>Terms & Conditions</h4>
-                            <p id="preview-terms">This service is subject to an annual subscription fee...</p>
+                            <p id="preview-terms"></p>
                         </div>
                     </div>
                     
                     <div class="footer-right">
                         <table class="totals-table">
                             <tr><td>Sub Total</td><td id="preview-subtotal">₹0.00</td></tr>
-                            <tr id="row-tax1"><td id="label-tax1">CGST (9%)</td><td id="preview-tax1">₹0.00</td></tr>
-                            <tr id="row-tax2"><td id="label-tax2">SGST (9%)</td><td id="preview-tax2">₹0.00</td></tr>
+                            <tr id="row-tax1"><td id="label-tax1"></td><td id="preview-tax1">₹0.00</td></tr>
+                            <tr id="row-tax2"><td id="label-tax2"></td><td id="preview-tax2">₹0.00</td></tr>
                             <tr id="row-discount"><td>Discount</td><td id="preview-discount">(-) ₹0.00</td></tr>
                             <tr class="grand-total-row"><td>Total</td><td id="preview-grand-total">₹0.00</td></tr>
                         </table>
@@ -527,20 +526,18 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            const defaultItems = [
-                { id: "srv-1", title: "Tier 1: Essentials, done right", desc: "First year setup included. Then ₹599/year from year 2.", rate: 2999 },
-                { id: "srv-2", title: "Tier 2: Built around your shop", desc: "First year setup included. Then ₹599/year from year 2.", rate: 3999 },
-                { id: "srv-3", title: "Tier 3: Full Custom", desc: "First year setup included. Then ₹599/year from year 2.", rate: 9999 },
-                { id: "srv-4", title: "Add-on: WhatsApp Business Integration", desc: "Auto-send bills & udhaar reminders directly to customer WhatsApp.", rate: 1499 },
-                { id: "srv-5", title: "Add-on: Data Migration & Setup", desc: "Import your existing inventory from Excel, Tally, or Vyapar.", rate: 999 }
-            ];
-
             let items = [];
 
             const itemsContainer = document.getElementById('items-container');
             const addItemBtn = document.getElementById('add-item-btn');
             const accentColorInput = document.getElementById('accent-color');
             
+            // Storage key updated to v3 to force a blank slate
+            const STORAGE_KEY = 'invoice_data_blank_v3';
+            const LOGO_KEY = 'invoice_logo_blank_v3';
+            const SIG_KEY = 'invoice_signature_blank_v3';
+            const ACCENT_KEY = 'invoice_accent_blank_v3';
+
             const inputsToTrack = [
                 'biz-name', 'biz-address', 'biz-contact', 'client-name', 'client-address', 
                 'inv-number', 'inv-date', 'po-number', 'subject-text',
@@ -549,7 +546,7 @@
             ];
 
             function numberToWords(num) {
-                if (num === 0) return 'Zero';
+                if (num === 0) return 'Indian Rupee Zero Only';
                 const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
                 const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
 
@@ -586,7 +583,6 @@
                 });
             }
 
-            // Event Delegation for Items to ensure they always work
             itemsContainer.addEventListener('input', (e) => {
                 const id = e.target.dataset.id;
                 if (!id) return;
@@ -623,7 +619,7 @@
                 document.getElementById('preview-subject-text').innerText = document.getElementById('subject-text').value;
                 
                 const dateVal = document.getElementById('inv-date').value;
-                document.getElementById('preview-inv-date').innerText = dateVal ? new Date(dateVal).toLocaleDateString('en-GB') : '-';
+                document.getElementById('preview-inv-date').innerText = dateVal ? new Date(dateVal).toLocaleDateString('en-GB') : '';
 
                 document.getElementById('preview-terms').innerText = document.getElementById('terms-text').value;
 
@@ -656,8 +652,8 @@
                     tableBody.appendChild(tr);
                 });
 
-                const tax1Name = document.getElementById('tax1-name').value || 'Tax 1';
-                const tax2Name = document.getElementById('tax2-name').value || 'Tax 2';
+                const tax1Name = document.getElementById('tax1-name').value;
+                const tax2Name = document.getElementById('tax2-name').value;
                 
                 const tax1Amount = subtotal * (tax1Rate / 100);
                 const tax2Amount = subtotal * (tax2Rate / 100);
@@ -667,13 +663,13 @@
 
                 document.getElementById('preview-subtotal').innerText = formatCurrency(subtotal);
                 
-                if(tax1Rate > 0) {
+                if(tax1Rate > 0 && tax1Name) {
                     document.getElementById('row-tax1').style.display = 'table-row';
                     document.getElementById('label-tax1').innerText = `${tax1Name} (${tax1Rate}%)`;
                     document.getElementById('preview-tax1').innerText = formatCurrency(tax1Amount);
                 } else { document.getElementById('row-tax1').style.display = 'none'; }
 
-                if(tax2Rate > 0) {
+                if(tax2Rate > 0 && tax2Name) {
                     document.getElementById('row-tax2').style.display = 'table-row';
                     document.getElementById('label-tax2').innerText = `${tax2Name} (${tax2Rate}%)`;
                     document.getElementById('preview-tax2').innerText = formatCurrency(tax2Amount);
@@ -690,7 +686,6 @@
                 saveData();
             }
 
-            // Image Uploads
             document.getElementById('logo-upload').addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -699,7 +694,7 @@
                         document.getElementById('preview-logo').src = event.target.result;
                         document.getElementById('preview-logo').style.display = 'block';
                         document.getElementById('logo-fallback').style.display = 'none';
-                        localStorage.setItem('invoice_logo', event.target.result);
+                        localStorage.setItem(LOGO_KEY, event.target.result);
                     };
                     reader.readAsDataURL(file);
                 }
@@ -712,7 +707,7 @@
                     reader.onload = function(event) {
                         document.getElementById('preview-signature').src = event.target.result;
                         document.getElementById('preview-signature').style.display = 'block';
-                        localStorage.setItem('invoice_signature', event.target.result);
+                        localStorage.setItem(SIG_KEY, event.target.result);
                     };
                     reader.readAsDataURL(file);
                 }
@@ -722,17 +717,17 @@
                 const color = e.target.value;
                 document.documentElement.style.setProperty('--primary', color);
                 document.documentElement.style.setProperty('--primary-hover', color + 'cc'); 
-                localStorage.setItem('invoice_accent', color);
+                localStorage.setItem(ACCENT_KEY, color);
             });
 
             function saveData() {
                 const data = { items: items, fields: {} };
                 inputsToTrack.forEach(id => { data.fields[id] = document.getElementById(id).value; });
-                localStorage.setItem('invoice_data', JSON.stringify(data));
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             }
 
             function loadData() {
-                const savedData = localStorage.getItem('invoice_data');
+                const savedData = localStorage.getItem(STORAGE_KEY);
                 
                 function generateId() {
                     return 'srv-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
@@ -747,35 +742,32 @@
                             if(el) el.value = data.fields[key];
                         });
                     }
-                } else {
-                    items = JSON.parse(JSON.stringify(defaultItems)); // Deep copy
-                    document.getElementById('inv-date').valueAsDate = new Date();
                 }
 
                 addItemBtn.addEventListener('click', () => {
                     items.push({ 
                         id: generateId(), 
-                        title: "New Custom Service", 
-                        desc: "Description...", 
-                        rate: 0 
+                        title: "", 
+                        desc: "", 
+                        rate: "" 
                     });
                     renderSidebarItems();
                     updatePreview();
                     document.querySelector('.scroll-area').scrollTop = document.querySelector('.scroll-area').scrollHeight;
                 });
 
-                const savedLogo = localStorage.getItem('invoice_logo');
+                const savedLogo = localStorage.getItem(LOGO_KEY);
                 if(savedLogo) {
                     document.getElementById('preview-logo').src = savedLogo;
                     document.getElementById('preview-logo').style.display = 'block';
                     document.getElementById('logo-fallback').style.display = 'none';
                 }
-                const savedSig = localStorage.getItem('invoice_signature');
+                const savedSig = localStorage.getItem(SIG_KEY);
                 if(savedSig) {
                     document.getElementById('preview-signature').src = savedSig;
                     document.getElementById('preview-signature').style.display = 'block';
                 }
-                const savedAccent = localStorage.getItem('invoice_accent');
+                const savedAccent = localStorage.getItem(ACCENT_KEY);
                 if(savedAccent) {
                     document.documentElement.style.setProperty('--primary', savedAccent);
                     accentColorInput.value = savedAccent;
@@ -792,7 +784,13 @@
             document.getElementById('print-btn').addEventListener('click', () => { window.print(); });
 
             document.getElementById('clear-data-btn').addEventListener('click', () => {
-                if(confirm("Are you sure you want to reset all data to defaults?")) { localStorage.clear(); location.reload(); }
+                if(confirm("Are you sure you want to reset all data?")) { 
+                    localStorage.removeItem(STORAGE_KEY);
+                    localStorage.removeItem(LOGO_KEY);
+                    localStorage.removeItem(SIG_KEY);
+                    localStorage.removeItem(ACCENT_KEY);
+                    location.reload(); 
+                }
             });
 
             loadData();
