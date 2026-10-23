@@ -11,16 +11,18 @@
     
     <style>
         /* ============================================================
-           FLUX AURORA THEME (BLOCK 1)
+           FLUX AURORA THEME
            ============================================================ */
         :root {
             --bg-dark: #0d1117;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --primary: #6366f1; /* Indigo */
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #6366f1;
             --primary-hover: #4f46e5;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --success: #10b981;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -61,31 +63,20 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        .btn {
+            padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: all 0.2s ease; border: none; font-family: inherit;
         }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
-
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        
         .input-glass {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 14px;
-            outline: none;
-            transition: border 0.2s ease;
+            width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; padding: 12px 16px; border-radius: 12px; font-family: inherit; font-size: 14px;
+            outline: none; transition: border 0.2s ease;
         }
         .input-glass:focus { border-color: var(--primary); }
 
@@ -95,94 +86,65 @@
 
         /* Sidebar */
         .sidebar {
-            position: fixed;
-            left: 24px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            padding: 12px;
-            border-radius: 100px;
+            position: fixed; left: 24px; top: 50%; transform: translateY(-50%);
+            z-index: 50; display: flex; flex-direction: column; gap: 16px; padding: 12px; border-radius: 100px;
         }
         .nav-item {
-            width: 48px; height: 48px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s ease;
+            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease;
         }
         .nav-item:hover { background: rgba(255, 255, 255, 0.1); color: white; }
-        .nav-item.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-        }
+        .nav-item.active { background: var(--primary); color: white; box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
         .nav-item svg { width: 20px; height: 20px; }
 
         /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 100px;
-            padding: 32px;
-            overflow-y: auto;
-            height: 100vh;
-        }
+        .main-content { flex: 1; margin-left: 100px; padding: 32px; overflow-y: auto; height: 100vh; }
 
         /* Header */
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-        .search-bar {
-            display: flex;
-            align-items: center;
-            padding: 10px 16px;
-            border-radius: 16px;
-            width: 300px;
-        }
-        .search-bar input { background: transparent; border: none; outline: none; color: white; margin-left: 10px; width: 100%; font-size: 14px; }
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         
-        .user-profile {
-            display: flex; align-items: center; gap: 12px;
-            padding: 6px 16px 6px 6px; border-radius: 16px; cursor: pointer;
-        }
-        .avatar { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), #8b5cf6); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
         /* Views */
         .view-section { display: none; animation: fadeIn 0.3s ease; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Bento Placeholder */
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .bento-card {
-            border-radius: 24px;
-            padding: 24px;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+        /* Bento Grid */
+        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+        .bento-card { border-radius: 24px; padding: 24px; min-height: 200px; display: flex; flex-direction: column; }
         .bento-card h3 { font-size: 14px; color: var(--text-muted); font-weight: 500; margin-bottom: 10px; }
         .bento-card .value { font-size: 32px; font-weight: 700; color: white; }
         .col-span-2 { grid-column: span 2; }
 
         /* Login Screen */
-        #login-screen {
-            position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 100;
+        #login-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 100; }
+        .login-card { width: 100%; max-width: 400px; padding: 40px; border-radius: 24px; }
+
+        /* === INVOICE PREVIEW (A4) === */
+        .invoice-wrapper { background: #e2e8f0; padding: 20px; border-radius: 16px; overflow-x: auto; display: flex; justify-content: center; }
+        .invoice-paper {
+            width: 210mm; min-height: 297mm; background: #ffffff; color: #1f2937;
+            padding: 15mm; box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-family: 'Inter', sans-serif;
+            transform-origin: top center;
         }
-        .login-card {
-            width: 100%; max-width: 400px; padding: 40px; border-radius: 24px;
+        
+        .inv-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 20px; }
+        .inv-title h2 { font-family: 'Georgia', serif; font-size: 28px; color: #111827; margin: 0; }
+        .inv-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; font-size: 12px; }
+        .inv-meta-box { border: 1px solid #94a3b8; padding: 10px; }
+        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
+        .inv-table th { background: #f3f4f6; padding: 10px; text-align: left; border: 1px solid #e5e7eb; font-weight: 600; }
+        .inv-table td { padding: 10px; border: 1px solid #e5e7eb; vertical-align: top; }
+        .inv-totals { width: 50%; float: right; font-size: 12px; }
+        .inv-totals td { padding: 8px; border-bottom: 1px solid #e5e7eb; }
+        .inv-totals .grand-total td { font-weight: bold; font-size: 14px; border-bottom: 2px solid #111827; }
+        .signature-box { margin-top: 40px; text-align: right; font-size: 12px; }
+        .signature-box img { max-width: 150px; max-height: 60px; object-fit: contain; margin-bottom: 5px; }
+
+        @media print {
+            body * { visibility: hidden; }
+            .invoice-paper, .invoice-paper * { visibility: visible; }
+            .invoice-paper { position: absolute; left: 0; top: 0; width: 100%; padding: 0; box-shadow: none; }
+            .invoice-wrapper { padding: 0; background: white; }
         }
     </style>
 </head>
@@ -207,7 +169,7 @@
             <div style="display: flex; flex-direction: column; gap: 16px;">
                 <input type="email" id="auth-email" class="input-glass" placeholder="Email Address">
                 <input type="password" id="auth-password" class="input-glass" placeholder="Password">
-                <button id="btn-login" class="btn-primary" style="padding: 14px; margin-top: 8px;">Log In</button>
+                <button id="btn-login" class="btn btn-primary" style="padding: 14px; margin-top: 8px;">Log In</button>
                 <button id="btn-signup" style="background: transparent; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer;">Need an account? Sign Up</button>
             </div>
         </div>
@@ -237,19 +199,11 @@
             
             <!-- Top Header -->
             <header class="top-header">
-                <div class="search-bar glass-panel">
-                    <svg style="width: 18px; color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" placeholder="Search invoices...">
-                </div>
-                
+                <div></div> <!-- Spacer -->
                 <div style="display: flex; gap: 16px; align-items: center;">
-                    <button class="btn-primary">+ Create Invoice</button>
-                    <div class="user-profile glass-panel">
-                        <div class="avatar">O</div>
-                        <div>
-                            <div style="font-size: 13px; font-weight: 600;">Owner</div>
-                            <div style="font-size: 11px; color: var(--text-muted);">ShopSteward</div>
-                        </div>
+                    <button id="btn-create-invoice" class="btn btn-primary">+ Create Invoice</button>
+                    <div class="glass-panel" style="padding: 8px 16px; border-radius: 16px; font-size: 13px;">
+                        Logged in as <b>Owner</b>
                     </div>
                 </div>
             </header>
@@ -258,46 +212,232 @@
 
             <!-- View: Dashboard -->
             <section id="view-dashboard" class="view-section active">
-                <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans';">Welcome Back, Owner!</h1>
-                <p style="color: var(--text-muted); margin-top: 4px;">Here is your business overview.</p>
+                <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans';">Dashboard</h1>
                 
                 <div class="bento-grid">
                     <div class="bento-card glass-panel">
                         <h3>Total Revenue</h3>
+                        <div class="value" id="dash-revenue">₹0.00</div>
+                    </div>
+                    <div class="bento-card glass-panel">
+                        <h3>Total Invoices</h3>
+                        <div class="value" id="dash-count">0</div>
+                    </div>
+                    <div class="bento-card glass-panel">
+                        <h3>Pending Payment</h3>
                         <div class="value">₹0.00</div>
-                    </div>
-                    <div class="bento-card glass-panel">
-                        <h3>Pending Invoices</h3>
-                        <div class="value">0</div>
-                    </div>
-                    <div class="bento-card glass-panel">
-                        <h3>Paid Invoices</h3>
-                        <div class="value">0</div>
-                    </div>
-                    <div class="bento-card glass-panel col-span-2" style="min-height: 300px;">
-                        <h3>Revenue Chart</h3>
-                        <p style="color: var(--text-muted); font-size: 14px;">Chart will go here in Block 4</p>
-                    </div>
-                    <div class="bento-card glass-panel" style="min-height: 300px;">
-                        <h3>Recent Activity</h3>
-                        <p style="color: var(--text-muted); font-size: 14px;">List will go here</p>
                     </div>
                 </div>
             </section>
 
-            <!-- View: Invoices -->
+            <!-- View: Invoices (History) -->
             <section id="view-invoices" class="view-section">
-                <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans';">Invoices</h1>
-                <div class="glass-panel" style="margin-top: 20px; padding: 40px; text-align: center; border-radius: 24px;">
-                    <p style="color: var(--text-muted);">Invoice list will be built in Block 4.</p>
+                <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans'; margin-bottom: 20px;">Invoice History</h1>
+                <div class="glass-panel" style="border-radius: 24px; padding: 20px; overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; color: var(--text-muted);">
+                                <th style="padding: 12px;">Invoice No</th>
+                                <th style="padding: 12px;">Client</th>
+                                <th style="padding: 12px;">Date</th>
+                                <th style="padding: 12px;">Total</th>
+                                <th style="padding: 12px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-list">
+                            <!-- Invoices injected here -->
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
             <!-- View: Settings -->
             <section id="view-settings" class="view-section">
-                <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans';">Settings</h1>
-                <div class="glass-panel" style="margin-top: 20px; padding: 40px; text-align: center; border-radius: 24px;">
-                    <p style="color: var(--text-muted);">Business Profile & Branding form will be built in Block 2.</p>
+                <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans';">Business Profile</h1>
+                <p style="color: var(--text-muted); margin-top: 4px; margin-bottom: 24px;">These details will automatically appear on your invoices.</p>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                    <!-- Details Form -->
+                    <div class="glass-panel" style="padding: 24px; border-radius: 24px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                            <div>
+                                <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">Business Name</label>
+                                <input type="text" id="prof-name" class="input-glass" placeholder="ShopSteward.in">
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">Website</label>
+                                <input type="text" id="prof-website" class="input-glass" placeholder="www.shopsteward.in">
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">Contact Info</label>
+                            <input type="text" id="prof-contact" class="input-glass" placeholder="shopsteward.in@gmail.com / 8637560557">
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">Address</label>
+                            <textarea id="prof-address" class="input-glass" rows="2"></textarea>
+                        </div>
+                        
+                        <div style="margin-bottom: 24px;">
+                            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block;">Default Terms</label>
+                            <textarea id="prof-terms" class="input-glass" rows="3"></textarea>
+                        </div>
+                        
+                        <button id="btn-save-profile" class="btn btn-primary" style="width: 100%;">Save Profile</button>
+                    </div>
+
+                    <!-- Branding Assets -->
+                    <div class="glass-panel" style="padding: 24px; border-radius: 24px;">
+                        <div style="margin-bottom: 24px;">
+                            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">Business Logo</label>
+                            <div style="width: 100%; height: 120px; background: rgba(0,0,0,0.2); border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden;">
+                                <img id="preview-logo" style="max-width: 100%; max-height: 100%; display: none;">
+                                <span id="logo-placeholder" style="font-size: 12px; color: var(--text-muted);">Upload Logo</span>
+                            </div>
+                            <input type="file" id="upload-logo" style="font-size: 12px; color: var(--text-muted);">
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block;">Signature</label>
+                            <div style="width: 100%; height: 120px; background: rgba(0,0,0,0.2); border: 1px dashed rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden;">
+                                <img id="preview-signature" style="max-width: 100%; max-height: 100%; display: none;">
+                                <span id="sig-placeholder" style="font-size: 12px; color: var(--text-muted);">Upload Signature</span>
+                            </div>
+                            <input type="file" id="upload-signature" style="font-size: 12px; color: var(--text-muted);">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Create Invoice (Full screen layout) -->
+            <section id="view-create" class="view-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <a href="#invoices" style="color: var(--text-muted); font-size: 14px; text-decoration: none;">← Back to Invoices</a>
+                        <h1 style="font-size: 28px; font-family: 'Plus Jakarta Sans'; margin-top: 8px;">Create Invoice</h1>
+                    </div>
+                    <button id="btn-save-invoice" class="btn btn-success" style="padding: 12px 24px;">Save Invoice to Cloud</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+                    <!-- Form Side -->
+                    <div class="glass-panel" style="padding: 24px; border-radius: 24px; display: flex; flex-direction: column; gap: 16px;">
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label style="font-size: 12px; color: var(--text-muted);">Invoice No.</label>
+                                <input type="text" id="inv-no" class="input-glass" value="INV-001">
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; color: var(--text-muted);">Date</label>
+                                <input type="date" id="inv-date" class="input-glass">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-muted);">Client Name</label>
+                            <input type="text" id="inv-client" class="input-glass" placeholder="Rob & Joe Traders">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-muted);">Client Address</label>
+                            <textarea id="inv-address" class="input-glass" rows="2" placeholder="34, Richie Street, Chennai"></textarea>
+                        </div>
+
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h3 style="font-size: 14px; font-weight: 600;">Line Items</h3>
+                                <button id="btn-add-item" style="background: rgba(255,255,255,0.1); border: none; color: white; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;">+ Add Item</button>
+                            </div>
+                            
+                            <div id="items-container" style="display: flex; flex-direction: column; gap: 10px;">
+                                <!-- Items injected here -->
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label style="font-size: 12px; color: var(--text-muted);">Tax Rate (%)</label>
+                                <input type="number" id="inv-tax" class="input-glass" value="18">
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; color: var(--text-muted);">Discount (₹)</label>
+                                <input type="number" id="inv-discount" class="input-glass" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Side (A4 Paper) -->
+                    <div class="invoice-wrapper" style="position: sticky; top: 20px;">
+                        <div class="invoice-paper" id="invoice-preview">
+                            <!-- Header -->
+                            <div class="inv-header">
+                                <div style="display: flex; gap: 15px; align-items: center;">
+                                    <img id="prev-logo" src="" style="max-width: 100px; max-height: 60px; display: none;">
+                                    <div>
+                                        <h1 id="prev-biz-name" style="font-size: 20px; font-weight: 700; margin-bottom: 4px; color: #111827;">ShopSteward</h1>
+                                        <p id="prev-biz-address" style="font-size: 11px; color: #4b5563; line-height: 1.4;"></p>
+                                        <p id="prev-biz-contact" style="font-size: 11px; color: #4b5563; line-height: 1.4;"></p>
+                                        <p id="prev-biz-website" style="font-size: 11px; color: #4b5563; line-height: 1.4; font-weight: bold; color: var(--primary);"></p>
+                                    </div>
+                                </div>
+                                <div class="inv-title">
+                                    <h2>TAX INVOICE</h2>
+                                </div>
+                            </div>
+
+                            <!-- Meta -->
+                            <div class="inv-meta">
+                                <div class="inv-meta-box">
+                                    <p><span style="color: #6b7280; width: 80px; display: inline-block;">Invoice No:</span> <strong id="prev-inv-no">INV-001</strong></p>
+                                    <p style="margin-top: 5px;"><span style="color: #6b7280; width: 80px; display: inline-block;">Date:</span> <strong id="prev-inv-date">-</strong></p>
+                                    <p style="margin-top: 5px;"><span style="color: #6b7280; width: 80px; display: inline-block;">Terms:</span> <strong>Paid on Receipt</strong></p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <p style="font-weight: 700; color: #b91c1c;" id="prev-client">Client Name</p>
+                                    <p id="prev-address" style="margin-top: 4px; font-size: 11px; color: #4b5563;"></p>
+                                </div>
+                            </div>
+
+                            <!-- Items Table -->
+                            <table class="inv-table">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th width="55%">Item & Description</th>
+                                        <th width="20%" style="text-align: right;">Rate</th>
+                                        <th width="20%" style="text-align: right;">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="prev-items-body">
+                                    <!-- Items injected here -->
+                                </tbody>
+                            </table>
+
+                            <!-- Totals -->
+                            <div style="overflow: hidden;">
+                                <div style="width: 50%; float: left; font-size: 11px; color: #4b5563; padding-right: 20px;">
+                                    <p style="font-weight: bold; margin-bottom: 4px;">Terms & Conditions</p>
+                                    <p id="prev-terms"></p>
+                                </div>
+                                <table class="inv-totals">
+                                    <tr><td style="text-align: right; color: #6b7280;">Sub Total</td><td style="text-align: right; font-weight: bold;" id="prev-subtotal">₹0.00</td></tr>
+                                    <tr><td style="text-align: right; color: #6b7280;">Tax (<span id="prev-tax-rate">18</span>%)</td><td style="text-align: right; font-weight: bold;" id="prev-tax-amt">₹0.00</td></tr>
+                                    <tr><td style="text-align: right; color: #6b7280;">Discount</td><td style="text-align: right; font-weight: bold; color: #b91c1c;" id="prev-discount">-₹0.00</td></tr>
+                                    <tr class="grand-total"><td style="text-align: right;">Total</td><td style="text-align: right;" id="prev-total">₹0.00</td></tr>
+                                </table>
+                            </div>
+
+                            <!-- Signature -->
+                            <div class="signature-box" style="clear: both; padding-top: 40px;">
+                                <img id="prev-signature" src="" style="display: none;">
+                                <div style="width: 150px; border-bottom: 1px solid #9ca3af; margin-left: auto; margin-bottom: 5px;"></div>
+                                <p style="color: #6b7280; text-transform: uppercase;">Authorized Signature</p>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -305,25 +445,34 @@
     </div>
 
     <!-- ============================================================
-         JAVASCRIPT LOGIC (SUPABASE AUTH & ROUTER)
+         JAVASCRIPT LOGIC
          ============================================================ -->
     <script>
         // ⚠️ REPLACE THESE WITH YOUR SUPABASE CREDENTIALS
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+        const SUPABASE_URL = 'https://gbjyidkfrjdrynezslgy.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_7iKaqbUbGbhsIR5vChiOVg_wpCc6IM1';
 
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // UI Elements
         const loginScreen = document.getElementById('login-screen');
         const appShell = document.getElementById('app');
         const navItems = document.querySelectorAll('.nav-item[data-target]');
         const viewSections = document.querySelectorAll('.view-section');
 
+        // State
+        let currentUser = null;
+        let userProfile = null;
+        let invoiceItems = [];
+
         // === AUTHENTICATION ===
         async function checkSession() {
             const { data: { session } } = await sb.auth.getSession();
             if (session) {
+                currentUser = session.user;
                 showApp();
+                loadProfile();
+                loadInvoices();
             } else {
                 loginScreen.style.display = 'flex';
                 appShell.classList.remove('active');
@@ -333,7 +482,6 @@
         function showApp() {
             loginScreen.style.display = 'none';
             appShell.classList.add('active');
-            // Default route
             if(!window.location.hash) window.location.hash = '#dashboard';
             handleRoute();
         }
@@ -341,9 +489,14 @@
         document.getElementById('btn-login').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
-            const { error } = await sb.auth.signInWithPassword({ email, password });
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
             if (error) alert(error.message);
-            else showApp();
+            else {
+                currentUser = data.user;
+                showApp();
+                loadProfile();
+                loadInvoices();
+            }
         });
 
         document.getElementById('btn-signup').addEventListener('click', async () => {
@@ -351,7 +504,7 @@
             const password = document.getElementById('auth-password').value;
             const { error } = await sb.auth.signUp({ email, password });
             if (error) alert(error.message);
-            else alert("Signup successful! Check your email to verify, then log in.");
+            else alert("Signup successful! You can now log in.");
         });
 
         document.getElementById('btn-logout').addEventListener('click', async () => {
@@ -367,24 +520,284 @@
             });
         });
 
+        document.getElementById('btn-create-invoice').addEventListener('click', () => {
+            window.location.hash = '#create';
+            resetInvoiceForm();
+        });
+
         window.addEventListener('hashchange', handleRoute);
 
         function handleRoute() {
-            // Only route if logged in
             if (!appShell.classList.contains('active')) return;
-
             const hash = window.location.hash.replace('#', '') || 'dashboard';
 
-            // Update Sidebar active state
             navItems.forEach(item => {
                 if (item.getAttribute('data-target') === hash) item.classList.add('active');
                 else item.classList.remove('active');
             });
 
-            // Update Views
             viewSections.forEach(section => section.classList.remove('active'));
             const activeView = document.getElementById('view-' + hash);
             if (activeView) activeView.classList.add('active');
+        }
+
+        // === PROFILE SETTINGS ===
+        async function loadProfile() {
+            if(!currentUser) return;
+            const { data, error } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+            
+            if (data) {
+                userProfile = data;
+                document.getElementById('prof-name').value = data.business_name || '';
+                document.getElementById('prof-website').value = data.website || '';
+                document.getElementById('prof-contact').value = data.contact_info || '';
+                document.getElementById('prof-address').value = data.address || '';
+                document.getElementById('prof-terms').value = data.default_terms || '';
+                
+                if (data.logo_url) {
+                    document.getElementById('preview-logo').src = data.logo_url;
+                    document.getElementById('preview-logo').style.display = 'block';
+                    document.getElementById('logo-placeholder').style.display = 'none';
+                    
+                    document.getElementById('prev-logo').src = data.logo_url;
+                    document.getElementById('prev-logo').style.display = 'block';
+                }
+                if (data.signature_url) {
+                    document.getElementById('preview-signature').src = data.signature_url;
+                    document.getElementById('preview-signature').style.display = 'block';
+                    document.getElementById('sig-placeholder').style.display = 'none';
+                    
+                    document.getElementById('prev-signature').src = data.signature_url;
+                    document.getElementById('prev-signature').style.display = 'block';
+                }
+                
+                // Update A4 Preview Header
+                document.getElementById('prev-biz-name').innerText = data.business_name || 'Business Name';
+                document.getElementById('prev-biz-address').innerText = data.address || '';
+                document.getElementById('prev-biz-contact').innerText = data.contact_info || '';
+                document.getElementById('prev-biz-website').innerText = data.website || '';
+                document.getElementById('prev-terms').innerText = data.default_terms || '';
+            }
+        }
+
+        document.getElementById('btn-save-profile').addEventListener('click', async () => {
+            if(!currentUser) return;
+            const btn = document.getElementById('btn-save-profile');
+            btn.innerText = "Saving...";
+
+            const updates = {
+                id: currentUser.id,
+                business_name: document.getElementById('prof-name').value,
+                website: document.getElementById('prof-website').value,
+                contact_info: document.getElementById('prof-contact').value,
+                address: document.getElementById('prof-address').value,
+                default_terms: document.getElementById('prof-terms').value
+            };
+
+            const { error } = await sb.from('profiles').upsert(updates);
+            if (error) alert("Error saving: " + error.message);
+            else alert("Profile saved successfully!");
+            btn.innerText = "Save Profile";
+            loadProfile();
+        });
+
+        document.getElementById('upload-logo').addEventListener('change', async (e) => {
+            if(!currentUser) return;
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('preview-logo').src = URL.createObjectURL(file);
+            document.getElementById('preview-logo').style.display = 'block';
+            document.getElementById('logo-placeholder').style.display = 'none';
+
+            const fileName = `${currentUser.id}-logo.png`;
+            await sb.storage.from('branding').upload(fileName, file, { upsert: true });
+            const { data } = sb.storage.from('branding').getPublicUrl(fileName);
+            await sb.from('profiles').upsert({ id: currentUser.id, logo_url: data.publicUrl });
+            alert("Logo uploaded!");
+            loadProfile();
+        });
+
+        document.getElementById('upload-signature').addEventListener('change', async (e) => {
+            if(!currentUser) return;
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            document.getElementById('preview-signature').src = URL.createObjectURL(file);
+            document.getElementById('preview-signature').style.display = 'block';
+            document.getElementById('sig-placeholder').style.display = 'none';
+
+            const fileName = `${currentUser.id}-signature.png`;
+            await sb.storage.from('branding').upload(fileName, file, { upsert: true });
+            const { data } = sb.storage.from('branding').getPublicUrl(fileName);
+            await sb.from('profiles').upsert({ id: currentUser.id, signature_url: data.publicUrl });
+            alert("Signature uploaded!");
+            loadProfile();
+        });
+
+        // === INVOICE CREATOR ===
+        function resetInvoiceForm() {
+            invoiceItems = [];
+            document.getElementById('inv-no').value = 'INV-' + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('inv-date').valueAsDate = new Date();
+            document.getElementById('inv-client').value = '';
+            document.getElementById('inv-address').value = '';
+            renderInvoiceItems();
+            updateInvoicePreview();
+        }
+
+        document.getElementById('btn-add-item').addEventListener('click', () => {
+            invoiceItems.push({ id: Date.now(), title: '', desc: '', rate: 0 });
+            renderInvoiceItems();
+        });
+
+        function renderInvoiceItems() {
+            const container = document.getElementById('items-container');
+            container.innerHTML = '';
+            
+            invoiceItems.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.style.cssText = "background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; position: relative; border: 1px solid rgba(255,255,255,0.05);";
+                div.innerHTML = `
+                    <button onclick="removeInvoiceItem(${item.id})" style="position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer;">×</button>
+                    <input type="text" placeholder="Item Title" value="${item.title}" oninput="updateItem(${item.id}, 'title', this.value)" class="input-glass" style="margin-bottom: 8px; padding: 8px 12px; font-size: 13px;">
+                    <input type="text" placeholder="Description" value="${item.desc}" oninput="updateItem(${item.id}, 'desc', this.value)" class="input-glass" style="margin-bottom: 8px; padding: 8px 12px; font-size: 13px;">
+                    <input type="number" placeholder="Rate (₹)" value="${item.rate}" oninput="updateItem(${item.id}, 'rate', this.value)" class="input-glass" style="padding: 8px 12px; font-size: 13px;">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        window.removeInvoiceItem = (id) => {
+            invoiceItems = invoiceItems.filter(i => i.id !== id);
+            renderInvoiceItems();
+            updateInvoicePreview();
+        };
+
+        window.updateItem = (id, field, value) => {
+            const item = invoiceItems.find(i => i.id === id);
+            if(item) {
+                item[field] = field === 'rate' ? (parseFloat(value) || 0) : value;
+                updateInvoicePreview();
+            }
+        };
+
+        // Bind meta inputs to preview
+        ['inv-no', 'inv-date', 'inv-client', 'inv-address', 'inv-tax', 'inv-discount'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateInvoicePreview);
+        });
+
+        function updateInvoicePreview() {
+            // Meta
+            document.getElementById('prev-inv-no').innerText = document.getElementById('inv-no').value;
+            const dateVal = document.getElementById('inv-date').value;
+            document.getElementById('prev-inv-date').innerText = dateVal ? new Date(dateVal).toLocaleDateString('en-GB') : '';
+            document.getElementById('prev-client').innerText = document.getElementById('inv-client').value || 'Client Name';
+            document.getElementById('prev-address').innerHTML = document.getElementById('inv-address').value.replace(/\n/g, '<br>');
+
+            // Items
+            const tbody = document.getElementById('prev-items-body');
+            tbody.innerHTML = '';
+            let subtotal = 0;
+
+            invoiceItems.forEach((item, index) => {
+                subtotal += item.rate;
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align: center;">${index + 1}</td>
+                        <td><strong>${item.title}</strong><br><span style="color: #6b7280; font-size: 10px;">${item.desc}</span></td>
+                        <td style="text-align: right;">₹${item.rate.toFixed(2)}</td>
+                        <td style="text-align: right;">₹${item.rate.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            // Calculations
+            const taxRate = parseFloat(document.getElementById('inv-tax').value) || 0;
+            const discount = parseFloat(document.getElementById('inv-discount').value) || 0;
+            
+            const taxAmount = subtotal * (taxRate / 100);
+            const total = (subtotal + taxAmount) - discount;
+
+            document.getElementById('prev-subtotal').innerText = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('prev-tax-rate').innerText = taxRate;
+            document.getElementById('prev-tax-amt').innerText = `₹${taxAmount.toFixed(2)}`;
+            document.getElementById('prev-discount').innerText = `-₹${discount.toFixed(2)}`;
+            document.getElementById('prev-total').innerText = `₹${total.toFixed(2)}`;
+        }
+
+        // === SAVE INVOICE TO SUPABASE ===
+        document.getElementById('btn-save-invoice').addEventListener('click', async () => {
+            if(!currentUser) return;
+            if(invoiceItems.length === 0) return alert("Please add at least one item.");
+
+            const btn = document.getElementById('btn-save-invoice');
+            btn.innerText = "Saving...";
+
+            const subtotal = invoiceItems.reduce((s, i) => s + i.rate, 0);
+            const taxRate = parseFloat(document.getElementById('inv-tax').value) || 0;
+            const discount = parseFloat(document.getElementById('inv-discount').value) || 0;
+            const taxAmount = subtotal * (taxRate / 100);
+            const total = (subtotal + taxAmount) - discount;
+
+            const invoiceData = {
+                user_id: currentUser.id,
+                invoice_number: document.getElementById('inv-no').value,
+                client_name: document.getElementById('inv-client').value,
+                client_address: document.getElementById('inv-address').value,
+                date: document.getElementById('inv-date').value,
+                items: invoiceItems,
+                subtotal: subtotal,
+                tax_rate: taxRate,
+                tax_amount: taxAmount,
+                discount: discount,
+                total: total
+            };
+
+            const { error } = await sb.from('invoices').insert([invoiceData]);
+
+            if (error) {
+                alert("Error saving: " + error.message);
+            } else {
+                alert("Invoice saved successfully!");
+                window.location.hash = '#invoices';
+                loadInvoices();
+            }
+            btn.innerText = "Save Invoice to Cloud";
+        });
+
+        // === INVOICE HISTORY ===
+        async function loadInvoices() {
+            if(!currentUser) return;
+            const { data, error } = await sb.from('invoices').select('*').order('created_at', { ascending: false });
+            
+            if (data) {
+                // Update Dashboard
+                const totalRev = data.reduce((s, inv) => s + Number(inv.total), 0);
+                document.getElementById('dash-revenue').innerText = `₹${totalRev.toFixed(2)}`;
+                document.getElementById('dash-count').innerText = data.length;
+
+                // Update Table
+                const tbody = document.getElementById('invoice-list');
+                tbody.innerHTML = '';
+                
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">No invoices yet.</td></tr>';
+                    return;
+                }
+
+                data.forEach(inv => {
+                    tbody.innerHTML += `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 12px; font-weight: 600;">${inv.invoice_number}</td>
+                            <td style="padding: 12px;">${inv.client_name || 'Walk-in'}</td>
+                            <td style="padding: 12px; color: var(--text-muted);">${new Date(inv.date).toLocaleDateString('en-GB')}</td>
+                            <td style="padding: 12px; font-weight: bold; color: var(--success);">₹${Number(inv.total).toFixed(2)}</td>
+                            <td style="padding: 12px;"><span style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 4px 8px; border-radius: 6px; font-size: 12px;">Paid</span></td>
+                        </tr>
+                    `;
+                });
+            }
         }
 
         // Initialize
