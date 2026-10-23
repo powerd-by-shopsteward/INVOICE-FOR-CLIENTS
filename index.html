@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flux Invoice Studio</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- SUPABASE SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary: #059669;
@@ -116,7 +118,7 @@
         .input-group { margin-bottom: 12px; }
         .input-group label { display: block; font-size: 11px; color: #6b7280; margin-bottom: 6px; font-weight: 600; }
 
-        input[type="text"], input[type="number"], input[type="date"], textarea {
+        input[type="text"], input[type="number"], input[type="date"], textarea, select {
             width: 100%;
             background: #ffffff;
             border: 1px solid #e5e7eb;
@@ -128,7 +130,7 @@
             transition: all 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
@@ -187,13 +189,23 @@
         .item-row .remove-item:hover { transform: scale(1.1); }
 
         /* Action Buttons */
-        .action-buttons { display: flex; gap: 10px; margin-top: 30px; }
+        .action-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 30px; }
+        .btn-row { display: flex; gap: 10px; }
+        
         button.btn-primary {
             flex: 2; padding: 14px; background: #111827; color: white;
             border: none; border-radius: 30px; font-weight: 600; font-size: 14px; cursor: pointer;
             box-shadow: 0 4px 15px rgba(17, 24, 39, 0.3); transition: all 0.2s;
         }
         button.btn-primary:hover { background: #374151; transform: translateY(-1px); }
+        
+        button.btn-cloud {
+            width: 100%; padding: 14px; background: #0284c7; color: white;
+            border: none; border-radius: 30px; font-weight: 600; font-size: 14px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3); transition: all 0.2s;
+        }
+        button.btn-cloud:hover { background: #0369a1; transform: translateY(-1px); }
+
         button.btn-danger {
             flex: 1; padding: 14px; background: #fee2e2; color: #b91c1c;
             border: none; border-radius: 30px; font-weight: 600; font-size: 14px; cursor: pointer;
@@ -219,7 +231,6 @@
         .inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
         .inv-brand { display: flex; gap: 15px; align-items: center; }
         
-        /* Adjusted image properties to handle external files smoothly */
         .logo-img { max-width: 120px; max-height: 70px; object-fit: contain; }
         
         .brand-text h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; margin-bottom: 4px; color: #111827; }
@@ -318,6 +329,11 @@
                     <div class="input-group">
                         <label>Contact Info</label>
                         <input type="text" id="biz-contact" value="shopsteward.in@gmail.com / 8637560557">
+                    </div>
+                    <!-- NEW: WEBSITE FIELD -->
+                    <div class="input-group">
+                        <label>Website</label>
+                        <input type="text" id="biz-website" value="www.shopsteward.in">
                     </div>
                     
                     <div class="file-upload-row">
@@ -424,8 +440,11 @@
                 </div>
                 
                 <div class="action-buttons">
-                    <button id="print-btn" class="btn-primary">Print / Save PDF</button>
-                    <button id="clear-data-btn" class="btn-danger">Clear All</button>
+                    <button id="save-cloud-btn" class="btn-cloud">☁ Save to Supabase Cloud</button>
+                    <div class="btn-row">
+                        <button id="print-btn" class="btn-primary">Print / Save PDF</button>
+                        <button id="clear-data-btn" class="btn-danger">Clear All</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -445,6 +464,8 @@
                             <h1 id="preview-biz-name"></h1>
                             <p id="preview-biz-address"></p>
                             <p id="preview-biz-contact"></p>
+                            <!-- NEW: WEBSITE PREVIEW -->
+                            <p id="preview-biz-website" style="font-weight: 600; color: var(--primary);"></p>
                         </div>
                     </div>
                     <div class="inv-title">
@@ -539,6 +560,15 @@
     </div>
 
     <script>
+        // ==========================================
+        // 1. SUPABASE CONFIGURATION (PASTE YOURS HERE)
+        // ==========================================
+        const SUPABASE_URL = 'https://gbjyidkfrjdrynezslgy.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_7iKaqbUbGbhsIR5vChiOVg_wpCc6IM1';
+        
+        // Initialize Supabase
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         document.addEventListener('DOMContentLoaded', () => {
             
             let items = [];
@@ -547,14 +577,14 @@
             const addItemBtn = document.getElementById('add-item-btn');
             const accentColorInput = document.getElementById('accent-color');
             
-            // Bumped to v8 to clear old base64 cached data
-            const STORAGE_KEY = 'invoice_data_blank_v8';
-            const LOGO_KEY = 'invoice_logo_blank_v8';
-            const SIG_KEY = 'invoice_signature_blank_v8';
-            const ACCENT_KEY = 'invoice_accent_blank_v8';
+            // Bumped to v9 to clear old cached data and load the website field
+            const STORAGE_KEY = 'invoice_data_blank_v9';
+            const LOGO_KEY = 'invoice_logo_blank_v9';
+            const SIG_KEY = 'invoice_signature_blank_v9';
+            const ACCENT_KEY = 'invoice_accent_blank_v9';
 
             const inputsToTrack = [
-                'biz-name', 'biz-address', 'biz-contact', 'client-name', 'client-address', 
+                'biz-name', 'biz-address', 'biz-contact', 'biz-website', 'client-name', 'client-address', 
                 'inv-number', 'inv-date', 'po-number', 'subject-text',
                 'tax1-name', 'tax1-rate', 'tax2-name', 'tax2-rate', 
                 'discount-amount', 'paid-amount', 'terms-text'
@@ -625,6 +655,9 @@
                 document.getElementById('preview-biz-address').innerText = document.getElementById('biz-address').value;
                 document.getElementById('preview-biz-contact').innerText = document.getElementById('biz-contact').value;
                 
+                // NEW: UPDATE WEBSITE
+                document.getElementById('preview-biz-website').innerText = document.getElementById('biz-website').value;
+
                 document.getElementById('preview-client-name').innerText = document.getElementById('client-name').value;
                 document.getElementById('preview-client-address').innerHTML = document.getElementById('client-address').value.replace(/\n/g, '<br>');
                 document.getElementById('preview-ship-address').innerHTML = document.getElementById('client-address').value.replace(/\n/g, '<br>');
@@ -753,6 +786,56 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             }
 
+            // ==========================================
+            // 2. SUPABASE SAVE TO CLOUD FUNCTION
+            // ==========================================
+            document.getElementById('save-cloud-btn').addEventListener('click', async () => {
+                const btn = document.getElementById('save-cloud-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Saving...';
+                btn.disabled = true;
+
+                const invNumber = document.getElementById('inv-number').value;
+                const clientName = document.getElementById('client-name').value;
+
+                if(!invNumber || !clientName) {
+                    alert("Please enter at least an Invoice Number and Client Name before saving.");
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Prepare the data object to send to Supabase
+                const invoiceDataToSave = {
+                    invoice_number: invNumber,
+                    client_name: clientName,
+                    invoice_data: {
+                        items: items,
+                        fields: {}
+                    }
+                };
+
+                // Collect all field values
+                inputsToTrack.forEach(id => { 
+                    invoiceDataToSave.invoice_data.fields[id] = document.getElementById(id).value; 
+                });
+
+                // Send to Supabase
+                const { data, error } = await supabaseClient
+                    .from('invoices')
+                    .insert([invoiceDataToSave]);
+
+                if (error) {
+                    console.error("Error saving to Supabase:", error);
+                    alert("Failed to save to Cloud: " + error.message);
+                } else {
+                    alert("✅ Invoice saved to Supabase Cloud successfully!");
+                }
+
+                btn.innerText = originalText;
+                btn.disabled = false;
+            });
+
             function loadData() {
                 const savedData = localStorage.getItem(STORAGE_KEY);
                 
@@ -783,7 +866,6 @@
                     document.querySelector('.scroll-area').scrollTop = document.querySelector('.scroll-area').scrollHeight;
                 });
 
-                // If a custom uploaded logo exists in local storage, override the GitHub image
                 const savedLogo = localStorage.getItem(LOGO_KEY);
                 if(savedLogo) {
                     const img = document.getElementById('preview-logo');
@@ -791,7 +873,6 @@
                     img.style.display = 'block';
                 }
                 
-                // If a custom uploaded signature exists in local storage, override the GitHub image
                 const savedSig = localStorage.getItem(SIG_KEY);
                 if(savedSig) {
                     const img = document.getElementById('preview-signature');
@@ -817,7 +898,7 @@
             document.getElementById('print-btn').addEventListener('click', () => { window.print(); });
 
             document.getElementById('clear-data-btn').addEventListener('click', () => {
-                if(confirm("Are you sure you want to reset all data? This will revert to your GitHub hosted logo and signature.")) { 
+                if(confirm("Are you sure you want to reset all data? This will revert to your default GitHub logo and signature.")) { 
                     localStorage.removeItem(STORAGE_KEY);
                     localStorage.removeItem(LOGO_KEY);
                     localStorage.removeItem(SIG_KEY);
