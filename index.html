@@ -145,8 +145,15 @@
             flex-direction: column;
         }
         
-        /* 1. Header */
+                /* 1. Header */
         .inv-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 15mm 15mm 5mm 15mm; }
+        
+        /* Updated .inv-brand to align logo and text */
+        .inv-brand { display: flex; align-items: center; gap: 15px; }
+        
+        .inv-brand h1 { font-family: 'Georgia', serif; font-size: 24px; margin: 0 0 4px 0; color: var(--inv-text); font-weight: normal; }
+        .inv-brand p { font-size: 12px; color: var(--inv-muted); margin: 0; }
+        .inv-title h2 { font-family: 'Arial', sans-serif; font-size: 36px; color: var(--inv-text); margin: 0; font-weight: normal; letter-spacing: 1px; }
         .inv-brand h1 { font-family: 'Georgia', serif; font-size: 24px; margin: 0 0 4px 0; color: var(--inv-text); font-weight: normal; }
         .inv-brand p { font-size: 12px; color: var(--inv-muted); margin: 0; }
         .inv-title h2 { font-family: 'Arial', sans-serif; font-size: 36px; color: var(--inv-text); margin: 0; font-weight: normal; letter-spacing: 1px; }
@@ -442,17 +449,20 @@
                     <div class="invoice-wrapper" style="position: sticky; top: 20px;">
                         <div class="invoice-paper" id="invoice-preview">
                             
-                            <!-- Header -->
+                                                        <!-- Header -->
                             <div class="inv-header">
                                 <div class="inv-brand">
-                                    <h1 id="prev-biz-name">ShopSteward.in</h1>
-                                    <p id="prev-biz-slogan">Premium Service Billing</p>
+                                    <!-- Added the logo image tag back here -->
+                                    <img id="prev-logo" src="" style="max-height: 60px; max-width: 120px; object-fit: contain; display: none;">
+                                    <div>
+                                        <h1 id="prev-biz-name">ShopSteward.in</h1>
+                                        <p id="prev-biz-slogan">Premium Service Billing</p>
+                                    </div>
                                 </div>
                                 <div class="inv-title">
                                     <h2>INVOICE</h2>
                                 </div>
                             </div>
-
                             <!-- Meta Bar -->
                             <div class="inv-meta-bar">
                                 <div class="inv-meta-item"><span>DATE</span> <strong id="prev-inv-date">-</strong></div>
@@ -635,6 +645,9 @@
                     document.getElementById('preview-logo').src = data.logo_url;
                     document.getElementById('preview-logo').style.display = 'block';
                     document.getElementById('logo-placeholder').style.display = 'none';
+                    document.getElementById('prev-logo').src = data.logo_url;
+                    document.getElementById('prev-logo').style.display = 'block';
+                }
                 }
                 if (data.signature_url) {
                     document.getElementById('preview-signature').src = data.signature_url;
