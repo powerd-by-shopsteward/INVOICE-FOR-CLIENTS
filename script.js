@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     
+    // Default items only load if there is no saved data
     const defaultItems = [
-        { id: Date.now() + 1, title: "Tier 1: Essentials, done right", desc: "First year setup included. Then ₹599/year from year 2.", rate: 2999 },
-        { id: Date.now() + 2, title: "Tier 2: Built around your shop", desc: "First year setup included. Then ₹599/year from year 2.", rate: 3999 },
-        { id: Date.now() + 3, title: "Tier 3: Full Custom", desc: "First year setup included. Then ₹599/year from year 2.", rate: 9999 },
-        { id: Date.now() + 4, title: "Add-on: WhatsApp Business Integration", desc: "Auto-send bills & udhaar reminders directly to customer WhatsApp.", rate: 1499 },
-        { id: Date.now() + 5, title: "Add-on: Data Migration & Setup", desc: "Import your existing inventory from Excel, Tally, or Vyapar.", rate: 999 }
+        { id: "srv-1", title: "Tier 1: Essentials, done right", desc: "First year setup included. Then ₹599/year from year 2.", rate: 2999 },
+        { id: "srv-2", title: "Tier 2: Built around your shop", desc: "First year setup included. Then ₹599/year from year 2.", rate: 3999 },
+        { id: "srv-3", title: "Tier 3: Full Custom", desc: "First year setup included. Then ₹599/year from year 2.", rate: 9999 },
+        { id: "srv-4", title: "Add-on: WhatsApp Business Integration", desc: "Auto-send bills & udhaar reminders directly to customer WhatsApp.", rate: 1499 },
+        { id: "srv-5", title: "Add-on: Data Migration & Setup", desc: "Import your existing inventory from Excel, Tally, or Vyapar.", rate: 999 }
     ];
 
     let items = [];
@@ -44,8 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function formatCurrency(amount) { return '₹' + amount.toFixed(2); }
 
+    // Re-renders the sidebar item inputs
     function renderSidebarItems() {
         itemsContainer.innerHTML = '';
+        
         items.forEach((item) => {
             const div = document.createElement('div');
             div.className = 'item-row';
@@ -57,33 +60,31 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             itemsContainer.appendChild(div);
         });
-
-        document.querySelectorAll('.item-title-input').forEach(input => {
-            input.addEventListener('input', (e) => {
-                items.find(i => i.id === parseInt(e.target.dataset.id)).title = e.target.value;
-                updatePreview();
-            });
-        });
-        document.querySelectorAll('.item-desc-input').forEach(input => {
-            input.addEventListener('input', (e) => {
-                items.find(i => i.id === parseInt(e.target.dataset.id)).desc = e.target.value;
-                updatePreview();
-            });
-        });
-        document.querySelectorAll('.item-rate-input').forEach(input => {
-            input.addEventListener('input', (e) => {
-                items.find(i => i.id === parseInt(e.target.dataset.id)).rate = parseFloat(e.target.value) || 0;
-                updatePreview();
-            });
-        });
-        document.querySelectorAll('.remove-item').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                items = items.filter(i => i.id !== parseInt(e.target.dataset.id));
-                renderSidebarItems();
-                updatePreview();
-            });
-        });
     }
+
+    // Attach event listeners globally to the container (Event Delegation for reliability)
+    itemsContainer.addEventListener('input', (e) => {
+        const id = e.target.dataset.id;
+        if (!id) return;
+
+        const item = items.find(i => i.id === id);
+        if (!item) return;
+
+        if (e.target.classList.contains('item-title-input')) item.title = e.target.value;
+        if (e.target.classList.contains('item-desc-input')) item.desc = e.target.value;
+        if (e.target.classList.contains('item-rate-input')) item.rate = parseFloat(e.target.value) || 0;
+
+        updatePreview();
+    });
+
+    itemsContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-item')) {
+            const id = e.target.dataset.id;
+            items = items.filter(i => i.id !== id);
+            renderSidebarItems();
+            updatePreview();
+        }
+    });
 
     function updatePreview() {
         // Text updates
@@ -93,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.getElementById('preview-client-name').innerText = document.getElementById('client-name').value;
         document.getElementById('preview-client-address').innerHTML = document.getElementById('client-address').value.replace(/\n/g, '<br>');
-        document.getElementById('preview-ship-address').innerHTML = document.getElementById('client-address').value.replace(/\n/g, '<br>'); // Mirrors bill to
+        document.getElementById('preview-ship-address').innerHTML = document.getElementById('client-address').value.replace(/\n/g, '<br>');
         
         document.getElementById('preview-inv-number').innerText = document.getElementById('inv-number').value;
         document.getElementById('preview-po-number').innerText = document.getElementById('po-number').value;
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('preview-terms').innerText = document.getElementById('terms-text').value;
 
-        // Table
+        // Table rendering
         const tableBody = document.getElementById('preview-table-body');
         tableBody.innerHTML = '';
         let subtotal = 0;
@@ -169,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveData();
     }
 
-    // Image Upload
+    // Image Uploads
     document.getElementById('logo-upload').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -204,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('invoice_accent', color);
     });
 
-    // Storage
+    // Local Storage
     function saveData() {
         const data = { items: items, fields: {} };
         inputsToTrack.forEach(id => { data.fields[id] = document.getElementById(id).value; });
@@ -213,6 +214,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadData() {
         const savedData = localStorage.getItem('invoice_data');
+        
+        // Generate unique IDs for added items
+        function generateId() {
+            return 'srv-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        }
+
         if (savedData) {
             const data = JSON.parse(savedData);
             if(data.items) items = data.items;
@@ -226,6 +233,20 @@ document.addEventListener('DOMContentLoaded', () => {
             items = [...defaultItems];
             document.getElementById('inv-date').valueAsDate = new Date();
         }
+
+        // Setup Add Button
+        addItemBtn.addEventListener('click', () => {
+            items.push({ 
+                id: generateId(), 
+                title: "New Custom Service", 
+                desc: "Description...", 
+                rate: 0 
+            });
+            renderSidebarItems();
+            updatePreview();
+            // Scroll to bottom of sidebar
+            document.querySelector('.scroll-area').scrollTop = document.querySelector('.scroll-area').scrollHeight;
+        });
 
         const savedLogo = localStorage.getItem('invoice_logo');
         if(savedLogo) {
@@ -252,16 +273,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(id).addEventListener('input', updatePreview);
     });
 
-    addItemBtn.addEventListener('click', () => {
-        items.push({ id: Date.now(), title: "New Custom Service", desc: "Description of service...", rate: 0 });
-        renderSidebarItems();
-        updatePreview();
-    });
-
     document.getElementById('print-btn').addEventListener('click', () => { window.print(); });
 
     document.getElementById('clear-data-btn').addEventListener('click', () => {
-        if(confirm("Are you sure you want to reset all data?")) { localStorage.clear(); location.reload(); }
+        if(confirm("Are you sure you want to reset all data to defaults?")) { localStorage.clear(); location.reload(); }
     });
 
     loadData();
