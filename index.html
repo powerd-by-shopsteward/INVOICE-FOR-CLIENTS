@@ -224,15 +224,18 @@
         .brand-text p { font-size: 11px; color: #4b5563; line-height: 1.5; }
         .inv-title h2 { font-family: Georgia, serif; font-size: 28px; color: #111827; letter-spacing: 1px; font-weight: normal; }
 
-        .inv-meta-grid { display: flex; border-top: 1px solid var(--border-invoice); border-left: 1px solid var(--border-invoice); }
+        /* FIX: Added border-right to the parent containers so the rightmost line is always visible */
+        .inv-meta-grid { display: flex; border-top: 1px solid var(--border-invoice); border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); }
         .meta-box { flex: 1; border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); padding: 12px 15px; }
+        .meta-box:last-child { border-right: none; } /* Prevent double border if needed, but we want it on the parent */
         .meta-row { display: flex; margin-bottom: 6px; font-size: 12px; }
         .meta-row:last-child { margin-bottom: 0; }
         .meta-row span { width: 100px; color: #6b7280; }
         .meta-row strong { color: #111827; font-weight: 600; }
 
-        .inv-address-grid { display: flex; border-left: 1px solid var(--border-invoice); }
+        .inv-address-grid { display: flex; border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); }
         .address-box { flex: 1; border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); padding: 12px 15px; }
+        .address-box:last-child { border-right: none; }
         .address-box h4 { font-size: 10px; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
         .address-box .client-name { font-weight: 700; color: #b91c1c; font-size: 13px; margin-bottom: 4px; }
         .address-box p { font-size: 12px; color: #111827; line-height: 1.5; }
@@ -240,7 +243,7 @@
         .inv-subject { border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); padding: 10px 15px; font-size: 12px; color: #111827; min-height: 38px; }
         .inv-subject span:first-child { color: #6b7280; }
 
-        .inv-table { width: 100%; border-collapse: collapse; }
+        .inv-table { width: 100%; border-collapse: collapse; border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); }
         .inv-table th { background: #f3f4f6; color: #111827; font-size: 11px; font-weight: 700; padding: 10px; border: 1px solid var(--border-invoice); text-transform: uppercase; }
         .inv-table td { padding: 12px 10px; border: 1px solid var(--border-invoice); vertical-align: top; font-size: 12px; }
         .text-right { text-align: right; }
@@ -249,7 +252,7 @@
         .item-desc { font-size: 11px; color: #6b7280; line-height: 1.4; }
         .amount-col { font-weight: 600; color: #111827; }
 
-        .inv-footer-grid { display: flex; border-left: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); }
+        .inv-footer-grid { display: flex; border-left: 1px solid var(--border-invoice); border-right: 1px solid var(--border-invoice); border-bottom: 1px solid var(--border-invoice); }
         .footer-left { flex: 1.2; border-right: 1px solid var(--border-invoice); padding: 12px 15px; display: flex; flex-direction: column; gap: 15px; }
         .footer-right { flex: 0.8; display: flex; flex-direction: column; }
         .words-section h4, .terms-section h4 { font-size: 11px; color: #111827; margin-bottom: 4px; font-weight: 700; }
@@ -260,7 +263,7 @@
         .totals-table td { padding: 8px 15px; font-size: 12px; color: #111827; border-bottom: 1px solid var(--border-invoice); }
         .totals-table td:first-child { text-align: right; color: #6b7280; }
         .totals-table td:last-child { text-align: right; font-weight: 600; width: 100px; }
-        .totals-table .grand-total-row td { font-weight: 700; font-size: 14px; border-bottom: 2px solid #111827; }
+        .totals-table .grand-total-row td { font-weight: 700; font-size: 14px; border-bottom: none; } /* Removed bottom border to let the container handle it */
 
         .signature-area { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 15px; border-top: 1px solid var(--border-invoice); min-height: 100px; }
         .signature-img { max-width: 150px; max-height: 60px; object-fit: contain; margin-bottom: 5px; }
@@ -270,11 +273,28 @@
         /* === PRINT STYLES === */
         @media print {
             @page { size: A4; margin: 0; }
+            
+            /* FORCE browsers to print background colors and borders */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
             body { background: white; height: auto; overflow: visible; }
             .sidebar, .bg-blob { display: none !important; }
             .app-container { display: block; }
             .preview-area { padding: 0; background: white; overflow: visible; display: block; }
-            .invoice-paper { box-shadow: none; width: 100%; min-height: 100vh; margin: 0; padding: 15mm; border-radius: 0; }
+            
+            /* Ensure exact size and no clipping */
+            .invoice-paper { 
+                box-shadow: none; 
+                width: 100%; 
+                min-height: 100vh; 
+                margin: 0; 
+                padding: 15mm; 
+                border-radius: 0; 
+            }
             .inv-table { page-break-inside: auto; }
             .inv-table tr { page-break-inside: avoid; page-break-after: auto; }
             .inv-footer-grid { page-break-inside: avoid; }
@@ -407,6 +427,10 @@
                         <label>Flat Discount (₹)</label>
                         <input type="number" id="discount-amount" value="">
                     </div>
+                    <div class="input-group" style="margin-top: 10px;">
+                        <label>Paid Amount (₹)</label>
+                        <input type="number" id="paid-amount" value="">
+                    </div>
                 </div>
 
                 <!-- Terms -->
@@ -447,7 +471,7 @@
                     <div class="meta-box">
                         <div class="meta-row"><span>#</span><strong id="preview-inv-number"></strong></div>
                         <div class="meta-row"><span>Invoice Date</span><strong id="preview-inv-date"></strong></div>
-                        <div class="meta-row"><span>Terms</span><strong>Due on Receipt</strong></div>
+                        <div class="meta-row"><span>Terms</span><strong>Paid on Receipt</strong></div>
                         <div class="meta-row"><span>P.O.#</span><strong id="preview-po-number"></strong></div>
                     </div>
                     <div class="meta-box right-empty"></div>
@@ -505,7 +529,11 @@
                             <tr id="row-tax1"><td id="label-tax1"></td><td id="preview-tax1">₹0.00</td></tr>
                             <tr id="row-tax2"><td id="label-tax2"></td><td id="preview-tax2">₹0.00</td></tr>
                             <tr id="row-discount"><td>Discount</td><td id="preview-discount">(-) ₹0.00</td></tr>
-                            <tr class="grand-total-row"><td>Total</td><td id="preview-grand-total">₹0.00</td></tr>
+                            
+                            <tr id="row-invoice-total" style="font-weight: bold; border-top: 1px solid var(--border-invoice);"><td>Total</td><td id="preview-invoice-total">₹0.00</td></tr>
+                            <tr id="row-paid" style="display: none;"><td>Paid Amount</td><td id="preview-paid">(-) ₹0.00</td></tr>
+                            
+                            <tr class="grand-total-row"><td>Balance Due</td><td id="preview-grand-total">₹0.00</td></tr>
                         </table>
 
                         <div class="signature-area">
@@ -532,17 +560,16 @@
             const addItemBtn = document.getElementById('add-item-btn');
             const accentColorInput = document.getElementById('accent-color');
             
-            // Storage key updated to v3 to force a blank slate
-            const STORAGE_KEY = 'invoice_data_blank_v3';
-            const LOGO_KEY = 'invoice_logo_blank_v3';
-            const SIG_KEY = 'invoice_signature_blank_v3';
-            const ACCENT_KEY = 'invoice_accent_blank_v3';
+            const STORAGE_KEY = 'invoice_data_blank_v5';
+            const LOGO_KEY = 'invoice_logo_blank_v5';
+            const SIG_KEY = 'invoice_signature_blank_v5';
+            const ACCENT_KEY = 'invoice_accent_blank_v5';
 
             const inputsToTrack = [
                 'biz-name', 'biz-address', 'biz-contact', 'client-name', 'client-address', 
                 'inv-number', 'inv-date', 'po-number', 'subject-text',
                 'tax1-name', 'tax1-rate', 'tax2-name', 'tax2-rate', 
-                'discount-amount', 'terms-text'
+                'discount-amount', 'paid-amount', 'terms-text'
             ];
 
             function numberToWords(num) {
@@ -659,9 +686,13 @@
                 const tax2Amount = subtotal * (tax2Rate / 100);
                 
                 const discountAmount = parseFloat(document.getElementById('discount-amount').value) || 0;
-                const grandTotal = subtotal + tax1Amount + tax2Amount - discountAmount;
+                const paidAmount = parseFloat(document.getElementById('paid-amount').value) || 0;
+                
+                const invoiceTotal = subtotal + tax1Amount + tax2Amount - discountAmount;
+                const balanceDue = invoiceTotal - paidAmount;
 
                 document.getElementById('preview-subtotal').innerText = formatCurrency(subtotal);
+                document.getElementById('preview-invoice-total').innerText = formatCurrency(invoiceTotal);
                 
                 if(tax1Rate > 0 && tax1Name) {
                     document.getElementById('row-tax1').style.display = 'table-row';
@@ -680,8 +711,15 @@
                     document.getElementById('preview-discount').innerText = `(-) ${formatCurrency(discountAmount)}`;
                 } else { document.getElementById('row-discount').style.display = 'none'; }
 
-                document.getElementById('preview-grand-total').innerText = formatCurrency(grandTotal);
-                document.getElementById('preview-words').innerText = numberToWords(grandTotal);
+                if(paidAmount > 0) {
+                    document.getElementById('row-paid').style.display = 'table-row';
+                    document.getElementById('preview-paid').innerText = `(-) ${formatCurrency(paidAmount)}`;
+                } else { 
+                    document.getElementById('row-paid').style.display = 'none'; 
+                }
+
+                document.getElementById('preview-grand-total').innerText = formatCurrency(balanceDue);
+                document.getElementById('preview-words').innerText = numberToWords(balanceDue);
 
                 saveData();
             }
@@ -778,7 +816,8 @@
             }
 
             inputsToTrack.forEach(id => {
-                document.getElementById(id).addEventListener('input', updatePreview);
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', updatePreview);
             });
 
             document.getElementById('print-btn').addEventListener('click', () => { window.print(); });
