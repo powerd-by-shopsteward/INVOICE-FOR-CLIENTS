@@ -21,51 +21,58 @@
            EXECUTIVE LIQUID GLASS DESIGN SYSTEM
            Subtle Studio Slate Backdrop + Apple-grade Specular Liquid Glass
            ============================================================ */
-        :root {
-            --bg-base: #080b11;
-            --bg-elevated: #0d121c;
-            --glass-surface: rgba(18, 24, 38, 0.65);
-            --glass-surface-hover: rgba(26, 35, 54, 0.78);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-border-light: rgba(255, 255, 255, 0.16);
-            --glass-specular: rgba(255, 255, 255, 0.28);
-            
-            --primary: #4f46e5;
-            --primary-glow: rgba(79, 70, 229, 0.35);
-            --primary-hover: #4338ca;
-            --primary-accent: #6366f1;
-            
-            --teal: #0d9488;
-            --teal-glow: rgba(13, 148, 136, 0.3);
-            --success: #10b981;
-            --success-glow: rgba(16, 185, 129, 0.25);
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --danger-glow: rgba(239, 68, 68, 0.25);
-            
-            --text-title: #f8fafc;
-            --text-body: #cbd5e1;
-            --text-muted: #64748b;
-            --text-faint: #475569;
-            
-            --radius-sm: 8px;
-            --radius-md: 14px;
-            --radius-lg: 20px;
-            --radius-xl: 28px;
-            
-            --shadow-liquid: 
-                inset 0 1px 0 0 var(--glass-specular),
-                inset 0 -1px 0 0 rgba(255, 255, 255, 0.03),
-                inset 0 0 30px 0 rgba(255, 255, 255, 0.015),
-                0 20px 50px -10px rgba(0, 0, 0, 0.6),
-                0 6px 18px -4px rgba(0, 0, 0, 0.4);
-                
-            --shadow-lift: 
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
-                inset 0 -1px 0 0 rgba(255, 255, 255, 0.06),
-                0 30px 70px -15px rgba(0, 0, 0, 0.75),
-                0 10px 25px -5px rgba(0, 0, 0, 0.5);
-        }
+       :root {
+    /* ---- Canvas: TRUE black ---- */
+    --bg-base:      #000000;
+    --bg-elevated:  #050505;
+
+    /* ---- Liquid Glass on black: near-invisible tint + strong rim ---- */
+    --glass-surface:       rgba(255, 255, 255, 0.028);
+    --glass-surface-hover: rgba(255, 255, 255, 0.055);
+    --glass-border:        rgba(255, 255, 255, 0.09);
+    --glass-border-light:  rgba(255, 255, 255, 0.20);
+    --glass-specular:      rgba(255, 255, 255, 0.55);
+
+    /* ---- Accents: slightly hotter for contrast on pure black ---- */
+    --primary:        #6366f1;
+    --primary-glow:   rgba(99, 102, 241, 0.45);
+    --primary-hover:  #818cf8;
+    --primary-accent: #818cf8;
+
+    --teal:        #14b8a6;
+    --teal-glow:   rgba(20, 184, 166, 0.35);
+    --success:     #22c55e;
+    --success-glow:rgba(34, 197, 94, 0.35);
+    --warning:     #f59e0b;
+    --danger:      #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.35);
+
+    /* ---- Type ---- */
+    --text-title: #ffffff;
+    --text-body:  #c9d1dc;
+    --text-muted: #8b95a7;
+    --text-faint: #5a6272;
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+
+    /* ---- Shadows: pure black needs INNER glow, not outer shadow ---- */
+    --shadow-liquid:
+        inset 0 1px 0 0 var(--glass-specular),
+        inset 0 -1px 0 0 rgba(255, 255, 255, 0.04),
+        inset 0 0 24px 0 rgba(255, 255, 255, 0.015),
+        0 0 0 1px rgba(255, 255, 255, 0.02),
+        0 12px 40px -8px rgba(0, 0, 0, 1);
+
+    --shadow-lift:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.75),
+        inset 0 -1px 0 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 32px 0 rgba(255, 255, 255, 0.03),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 20px 60px -10px rgba(0, 0, 0, 1);
+}
 
         * {
             box-sizing: border-box;
@@ -88,70 +95,54 @@
            Replaces loud Aurora blobs with refined executive lighting
            ============================================================ */
         .studio-backdrop {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-            background-color: var(--bg-base);
-            /* Architectural dot matrix */
-            background-image: 
-                radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-                /* Top overhead studio ambient soft spotlight */
-                radial-gradient(ellipse 90% 50% at 50% -10%, rgba(79, 70, 229, 0.12), transparent 75%),
-                /* Subtle secondary teal rim fill */
-                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(13, 148, 136, 0.06), transparent 70%),
-                /* Left corner vignette */
-                radial-gradient(circle at 0% 50%, rgba(99, 102, 241, 0.04), transparent 60%);
-            background-size: 28px 28px, 100% 100%, 100% 100%, 100% 100%;
-            background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-        }
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: #000000;
+    background-image:
+        /* micro dot matrix — barely visible, adds texture */
+        radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        /* indigo bloom top */
+        radial-gradient(ellipse 70% 40% at 50% -10%, rgba(99, 102, 241, 0.10), transparent 70%),
+        /* teal bloom bottom-right */
+        radial-gradient(ellipse 55% 35% at 100% 105%, rgba(20, 184, 166, 0.07), transparent 70%);
+    background-size: 32px 32px, 100% 100%, 100% 100%;
+    background-repeat: repeat, no-repeat, no-repeat;
+}
 
-        /* Subtle hairline horizon line */
-        .studio-backdrop::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 15%;
-            right: 15%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.4), rgba(255, 255, 255, 0.3), rgba(13, 148, 136, 0.4), transparent);
-        }
-
+.studio-backdrop::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 15%; right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent,
+        rgba(99, 102, 241, 0.5),
+        rgba(255, 255, 255, 0.35),
+        rgba(20, 184, 166, 0.5),
+        transparent);
+}
         /* ============================================================
            LIQUID GLASS PANELS & CARDS
            ============================================================ */
         .liquid-glass {
-            background: var(--glass-surface);
-            backdrop-filter: blur(28px) saturate(190%) contrast(1.05);
-            -webkit-backdrop-filter: blur(28px) saturate(190%) contrast(1.05);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-liquid);
-            position: relative;
-            isolation: isolate;
-            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+    background: var(--glass-surface);
+    backdrop-filter: blur(24px) saturate(160%) brightness(1.15);
+    -webkit-backdrop-filter: blur(24px) saturate(160%) brightness(1.15);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-liquid);
+}
 
         .liquid-glass::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, 0.28) 0%,
-                rgba(255, 255, 255, 0.08) 25%,
-                transparent 50%,
-                rgba(255, 255, 255, 0.05) 75%,
-                rgba(255, 255, 255, 0.20) 100%
-            );
-            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-            z-index: 1;
-        }
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.14) 18%,
+        transparent 48%,
+        rgba(255, 255, 255, 0.06) 78%,
+        rgba(255, 255, 255, 0.30) 100%
+    );
+}
 
         .liquid-glass-interactive:hover {
             transform: translateY(-2px);
@@ -923,6 +914,79 @@
                 visibility: visible !important;
             }
         }
+    /* Inputs — must sit ABOVE the black or they vanish */
+.input-liquid {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    color: var(--text-title);
+}
+.input-liquid::placeholder { color: var(--text-faint); }
+.input-liquid:focus {
+    border-color: var(--primary-accent);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.28);
+}
+
+/* Outline button */
+.btn-outline {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-title);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.24);
+}
+
+/* Primary — hotter indigo gradient reads better on pure black */
+.btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.5);
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.6);
+}
+
+/* Success — brighter green for OLED */
+.btn-success {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+}
+
+/* Dock */
+.dock-item            { color: var(--text-muted); }
+.dock-item:hover      { color: #ffffff; background: rgba(255, 255, 255, 0.08); }
+.dock-item.active     { background: var(--primary); color: #fff; box-shadow: 0 0 24px var(--primary-glow); }
+.dock-item::after     { background: rgba(255, 255, 255, 0.96); color: #000; border: none; }
+
+/* Divider */
+.top-navbar { border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+
+/* Tables */
+.data-table th  { border-bottom: 1px solid rgba(255, 255, 255, 0.10); }
+.data-table td  { border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+.data-row:hover { background: rgba(255, 255, 255, 0.035); }
+
+/* Badges — brighter so they pop on pure black */
+.badge-success { background: rgba(34,197,94,0.12);  color: #4ade80; border-color: rgba(34,197,94,0.35); }
+.badge-warning { background: rgba(245,158,11,0.12); color: #fbbf24; border-color: rgba(245,158,11,0.35); }
+.badge-primary { background: rgba(99,102,241,0.15); color: #a5b4fc; border-color: rgba(99,102,241,0.40); }
+
+/* A4 sheet keeps its own printed look — but its shadow needs to be stronger on black */
+.a4-sheet {
+    box-shadow:
+        0 32px 80px -20px rgba(0, 0, 0, 1),
+        0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+/* Paid stamp on light sheet — unchanged, but bump contrast */
+.paid-stamp { border-width: 2.5px; font-weight: 900; }
+
+/* Logout icon */
+#btn-logout { color: #f87171; }    
     </style>
 </head>
 <body>
@@ -1654,7 +1718,7 @@
                         <!-- Logo Upload -->
                         <div class="liquid-glass" style="padding: 24px; border-radius: var(--radius-lg);">
                             <label class="form-label" style="margin-bottom: 8px; display: block;">Official Business Logo</label>
-                            <div style="width: 100%; height: 130px; background: rgba(0,0,0,0.3); border: 1px dashed var(--glass-border-light); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden; position: relative;">
+                            <div style="width: 100%; height: 130px; background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--glass-border-light); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden; position: relative;">
                                 <img id="preview-logo-img" style="max-width: 90%; max-height: 90%; object-fit: contain; display: none;">
                                 <span id="logo-empty-txt" style="font-size: 12px; color: var(--text-muted);">No Logo Uploaded</span>
                             </div>
@@ -1664,7 +1728,7 @@
                         <!-- Signature Upload -->
                         <div class="liquid-glass" style="padding: 24px; border-radius: var(--radius-lg);">
                             <label class="form-label" style="margin-bottom: 8px; display: block;">Authorized Digital Signature</label>
-                            <div style="width: 100%; height: 130px; background: rgba(0,0,0,0.3); border: 1px dashed var(--glass-border-light); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden; position: relative;">
+                            <div style="width: 100%; height: 130px; background: rgba(255, 255, 255, 0.03); border: 1px dashed var(--glass-border-light); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden; position: relative;">
                                 <img id="preview-sig-img" style="max-width: 90%; max-height: 90%; object-fit: contain; display: none;">
                                 <span id="sig-empty-txt" style="font-size: 12px; color: var(--text-muted);">No Signature Uploaded</span>
                             </div>
@@ -2084,7 +2148,7 @@
 
             invoiceLineItems.forEach((item, index) => {
                 const row = document.createElement('div');
-                row.style.cssText = `background: rgba(12, 17, 26, 0.7); border: 1px solid var(--glass-border); padding: 14px; border-radius: var(--radius-md); position: relative;`;
+                row.style.cssText = `background: rgba(255, 255, 255, 0.04); border: 1px solid var(--glass-border); padding: 14px; border-radius: var(--radius-md); position: relative;`;
                 row.innerHTML = `
                     <button type="button" onclick="removeLineItem(${item.id})" style="position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px;">×</button>
                     <div style="margin-bottom: 8px; padding-right: 30px;">
@@ -2506,7 +2570,7 @@ For any support or renewal inquiries, reach out to us at shopsteward.in@gmail.co
                 renewalInvoices.slice(0, 5).forEach(inv => {
                     const rDate = new Date(inv.subscription_renewal_date);
                     renewalsFeed.innerHTML += `
-                        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <strong style="font-size: 12px; color: var(--text-title);">${inv.client_name}</strong>
                                 <div style="font-size: 10px; color: var(--text-muted);">${rDate.toLocaleDateString('en-GB')}</div>
@@ -2617,12 +2681,12 @@ For any support or renewal inquiries, reach out to us at shopsteward.in@gmail.co
             if (analyticsChart) analyticsChart.destroy();
 
             const gradRev = ctx.createLinearGradient(0, 0, 0, 240);
-            gradRev.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-            gradRev.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+gradRev.addColorStop(0, 'rgba(34, 197, 94, 0.45)');     // ← changed
+gradRev.addColorStop(1, 'rgba(34, 197, 94, 0.0)');      // ← changed
 
-            const gradExp = ctx.createLinearGradient(0, 0, 0, 240);
-            gradExp.addColorStop(0, 'rgba(239, 68, 68, 0.35)');
-            gradExp.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
+const gradExp = ctx.createLinearGradient(0, 0, 0, 240);
+gradExp.addColorStop(0, 'rgba(239, 68, 68, 0.40)');     // ← changed
+gradExp.addColorStop(1, 'rgba(239, 68, 68, 0.0)');      // ← changed
 
             analyticsChart = new Chart(ctx, {
                 type: 'line',
@@ -2632,13 +2696,13 @@ For any support or renewal inquiries, reach out to us at shopsteward.in@gmail.co
                         {
                             label: 'Revenue',
                             data: revData,
-                            borderColor: '#10b981',
+                            borderColor: '22c55e',
                             backgroundColor: gradRev,
                             borderWidth: 2.5,
                             tension: 0.35,
                             fill: true,
                             pointRadius: 4,
-                            pointBackgroundColor: '#10b981'
+                            pointBackgroundColor: '22c55e'
                         },
                         {
                             label: 'Expenses',
@@ -2659,10 +2723,12 @@ For any support or renewal inquiries, reach out to us at shopsteward.in@gmail.co
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(10, 14, 22, 0.95)',
+                            backgroundColor: 'rgba(10, 10, 12, 0.98)',
                             borderColor: 'rgba(255, 255, 255, 0.12)',
                             borderWidth: 1,
                             padding: 10,
+                            titleColor: '#ffffff',
+    bodyColor:  '#c9d1dc',
                             callbacks: {
                                 label: ctx => `${ctx.dataset.label}: ₹${ctx.parsed.y.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
                             }
@@ -2671,12 +2737,12 @@ For any support or renewal inquiries, reach out to us at shopsteward.in@gmail.co
                     scales: {
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#64748b', font: { family: 'Inter', size: 11 } }
+                            ticks: { color: '#8b95a7', font: { family: 'Inter', size: 11 } }
                         },
                         y: {
-                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
                             ticks: {
-                                color: '#64748b',
+                                color: '#8b95a7',
                                 font: { family: 'Inter', size: 11 },
                                 callback: val => '₹' + val
                             },
