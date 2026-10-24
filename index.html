@@ -25,7 +25,7 @@
             --danger: #ef4444;
             --success: #10b981;
             --warning: #fbbf24;
-            --lg-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            --lg-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -59,8 +59,8 @@
     z-index: -1;
     pointer-events: none;
     overflow: hidden;
-    filter: blur(70px) saturate(140%);
-    opacity: 0.55;            /* intensity knob */
+    filter: blur(50px) saturate(165%);
+    opacity: 0.82;            /* intensity knob */
     will-change: transform;
 }
 
@@ -74,16 +74,16 @@
 }
 
 .aurora-field::before {
-    background:
-        radial-gradient(45% 45% at 30% 35%, rgba(139, 92, 246, 0.85) 0%, transparent 70%),
-        radial-gradient(40% 40% at 70% 60%, rgba(20, 184, 166, 0.75) 0%, transparent 70%);
+        background:
+        radial-gradient(45% 45% at 30% 35%, rgba(139, 92, 246, 0.95) 0%, transparent 70%),
+        radial-gradient(40% 40% at 70% 60%, rgba(20, 184, 166, 0.90) 0%, transparent 70%);
     animation: aurora-drift-a 26s ease-in-out infinite alternate;
 }
 
 .aurora-field::after {
-    background:
-        radial-gradient(40% 40% at 65% 30%, rgba(236, 72, 153, 0.55) 0%, transparent 70%),
-        radial-gradient(45% 45% at 35% 75%, rgba(99, 102, 241, 0.70) 0%, transparent 70%);
+        background:
+        radial-gradient(40% 40% at 65% 30%, rgba(236, 72, 153, 0.70) 0%, transparent 70%),
+        radial-gradient(45% 45% at 35% 75%, rgba(99, 102, 241, 0.82) 0%, transparent 70%);
     animation: aurora-drift-b 34s ease-in-out infinite alternate;
 }
 
@@ -118,10 +118,10 @@
     background-image: var(--lg-grain);
     background-size: 160px 160px;
     background-repeat: repeat;
-    background-color: rgba(255, 255, 255, 0.045);
+    background-color: rgba(255, 255, 255, 0.025);
 
-    backdrop-filter: blur(22px) saturate(180%) brightness(1.08);
-    -webkit-backdrop-filter: blur(22px) saturate(180%) brightness(1.08);
+        backdrop-filter: blur(28px) saturate(220%) contrast(1.05) brightness(1.08);
+    -webkit-backdrop-filter: blur(28px) saturate(220%) contrast(1.05) brightness(1.08);
 
     /* rim light + interior ambient + soft lift */
     box-shadow:
@@ -140,13 +140,13 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(
+        background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.55) 0%,
-        rgba(255, 255, 255, 0.10) 22%,
-        rgba(255, 255, 255, 0.02) 50%,
-        rgba(255, 255, 255, 0.10) 78%,
-        rgba(255, 255, 255, 0.45) 100%
+        rgba(255, 255, 255, 0.75) 0%,
+        rgba(255, 255, 255, 0.14) 22%,
+        rgba(255, 255, 255, 0.00) 50%,
+        rgba(255, 255, 255, 0.14) 78%,
+        rgba(255, 255, 255, 0.65) 100%
     );
     -webkit-mask:
         linear-gradient(#000 0 0) content-box,
@@ -185,14 +185,14 @@
         .bento-card:hover {
     transform: translateY(-3px);
     background-color: rgba(255, 255, 255, 0.075) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.22),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.09),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-        inset 0 0 50px rgba(255, 255, 255, 0.04),
-        0 28px 70px -16px rgba(0, 0, 0, 0.62),
-        0 6px 20px -4px rgba(0, 0, 0, 0.4),
-        0 0 40px rgba(99, 102, 241, 0.10);
+        box-shadow:
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.30),
+        inset 0 -1px 0 0 rgba(255, 255, 255, 0.10),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.25),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.06),
+        inset 0 0 50px rgba(255, 255, 255, 0.05),
+        0 24px 60px -16px rgba(0, 0, 0, 0.55),
+        0 4px 16px -4px rgba(0, 0, 0, 0.35);
 }
 
         .nav-item {
