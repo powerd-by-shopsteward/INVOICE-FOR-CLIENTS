@@ -14,7 +14,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Cinzel:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
     
     <style>
         /* ============================================================
@@ -864,157 +864,793 @@
             transform: rotate(-4deg);
         }
 
-        /* ============================================================
-           PRINT ENGINE OPTIMIZATION
-           Hides UI, prints ONLY the razor-sharp A4 sheet
+                        /* ============================================================
+           PRINT ENGINE OPTIMIZATION (Strict Isolated Printing)
            ============================================================ */
-                        @media print {
+        @media print {
             @page {
                 size: A4 portrait;
                 margin: 0;
             }
+
+            /* 1. Reset the page */
             html, body {
                 background: #ffffff !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 height: auto !important;
-                overflow: hidden !important;
+                overflow: visible !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            
-            /* Hide standard UI entirely so it takes up ZERO space */
-            .studio-backdrop, .sidebar-dock, .top-navbar, #auth-modal, .invoice-builder-form {
+
+            /* 2. Hide EVERYTHING by default */
+            body > *:not(#app-shell) {
                 display: none !important;
             }
 
-            /* Flatten the app layout */
-            .app-layout, .workspace, .view-pane, #view-create {
+            /* 3. Hide all UI panels and sidebars */
+            .sidebar-dock, .top-navbar, #auth-modal, 
+            .invoice-builder-form, .agreement-form-card {
+                display: none !important;
+            }
+
+            /* 4. Hide ALL view panes by default */
+            .view-pane {
+                display: none !important;
+            }
+
+            /* 5. ONLY show the active view being printed */
+            body.print-agreement #view-agreement,
+            body.print-invoice #view-create {
+                display: block !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+            }
+
+            /* 6. Hide the top headers inside the views (Back button, Save button, etc.) */
+            #view-agreement > div:first-child,
+            #view-create > div:first-child {
+                display: none !important;
+            }
+
+            /* 7. Flatten all wrapper containers so they don't create gaps */
+            .app-layout, .workspace, .agreement-form-grid,
+            #view-create > div[style*="grid-template-columns"],
+            .document-container, .invoice-preview-wrapper {
                 display: block !important;
                 position: static !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 height: auto !important;
                 width: 100% !important;
+                max-height: none !important;
                 overflow: visible !important;
-                background: transparent !important;
+                gap: 0 !important;
+                box-shadow: none !important;
             }
 
-            /* Break the CSS Grid so the invoice is the only thing left */
-            #view-create > div[style*="grid-template-columns"] {
-                display: block !important;
-                margin: 0 !important;
-            }
-
-            .invoice-preview-wrapper {
-                display: block !important;
-                position: static !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-            }
-
-            /* Strict 1-Page A4 Constraints */
-            .a4-sheet {
-                visibility: visible !important;
+            /* 8. Format the A4 Pages */
+            body.print-agreement .page-a4,
+            body.print-invoice .a4-sheet {
                 display: flex !important;
                 flex-direction: column !important;
-                position: relative !important;
                 width: 210mm !important;
-                height: 296.8mm !important; /* Slight buffer to prevent spillover */
+                height: 296.8mm !important; /* Slight buffer prevents phantom blank pages */
                 max-height: 296.8mm !important;
+                min-height: 296.8mm !important;
                 margin: 0 auto !important;
-                padding: 0 !important;
+                padding: 16mm 20mm 14mm 20mm !important;
                 box-shadow: none !important;
                 border: none !important;
                 border-radius: 0 !important;
-                page-break-after: avoid !important;
+                page-break-after: always !important;
+                break-after: page !important;
                 page-break-inside: avoid !important;
-                overflow: hidden !important; /* Clips any accidental overflow */
-            }
-            
-            .a4-sheet * {
-                visibility: visible !important;
+                break-inside: avoid !important;
+                overflow: hidden !important;
+                background: #ffffff !important;
             }
 
-            /* Force the table wrapper to take up available space */
-            .a4-sheet > div[style*="padding: 4mm"] {
-                flex: 1 1 auto !important;
+            /* Invoice has its own inner padding, so remove the outer padding */
+            body.print-invoice .a4-sheet {
+                padding: 0 !important;
+            }
+
+            /* 9. Remove the page break from the LAST page so it doesn't print an extra blank page */
+            body.print-agreement .page-a4:last-child,
+            body.print-invoice .a4-sheet:last-child {
+                page-break-after: auto !important;
+                break-after: auto !important;
+            }
+
+            /* Hide footers during print to prevent accidental overflow */
+            .page-footer {
+                display: none !important;
+            }
+                        /* ==========================================
+               FORCE STARK BLACK TEXT FOR TABLES & CLAUSES
+               ========================================== */
+            
+            /* Force all table text to be completely solid black and slightly bolder */
+            .data-table td,
+            .cell-label,
+            .cell-value,
+            .clause-text {
+                color: #000000 !important;
+                opacity: 1 !important;
+                font-weight: 600 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Make the label background slightly darker for better contrast */
+            .cell-label {
+                background-color: #e2e8f0 !important;
+                border: 1px solid #000000 !important;
+            }
+
+            /* Make the table borders sharper */
+            .data-table, 
+            .data-table td {
+                border: 1px solid #000000 !important;
+            }
+
+            /* Make the watermark even fainter so it doesn't interfere with the text */
+            .watermark-layer {
+                opacity: 0.015 !important; 
             }
         }
-    /* Inputs — must sit ABOVE the black or they vanish */
-.input-liquid {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    color: var(--text-title);
-}
-.input-liquid::placeholder { color: var(--text-faint); }
-.input-liquid:focus {
-    border-color: var(--primary-accent);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.28);
+     /* ==========================================
+   DOCUMENT CONTAINER & A4 PAGE GEOMETRY
+   ========================================== */
+.document-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 40px 10px;
 }
 
-/* Outline button */
-.btn-outline {
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--text-title);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-}
-.btn-outline:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.24);
-}
-
-/* Primary — hotter indigo gradient reads better on pure black */
-.btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.5);
-}
-.btn-primary:hover {
-    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.6);
+.page-a4 {
+  width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  max-height: 297mm;
+  padding: 16mm 20mm 14mm 20mm;
+  background: #ffffff;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Success — brighter green for OLED */
-.btn-success {
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+/* Watermark Layer */
+.watermark-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  opacity: 0.045;
+  transform: rotate(-32deg) scale(1.15);
 }
 
-/* Dock */
-.dock-item            { color: var(--text-muted); }
-.dock-item:hover      { color: #ffffff; background: rgba(255, 255, 255, 0.08); }
-.dock-item.active     { background: var(--primary); color: #fff; box-shadow: 0 0 24px var(--primary-glow); }
-.dock-item::after     { background: rgba(255, 255, 255, 0.96); color: #000; border: none; }
-
-/* Divider */
-.top-navbar { border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
-
-/* Tables */
-.data-table th  { border-bottom: 1px solid rgba(255, 255, 255, 0.10); }
-.data-table td  { border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
-.data-row:hover { background: rgba(255, 255, 255, 0.035); }
-
-/* Badges — brighter so they pop on pure black */
-.badge-success { background: rgba(34,197,94,0.12);  color: #4ade80; border-color: rgba(34,197,94,0.35); }
-.badge-warning { background: rgba(245,158,11,0.12); color: #fbbf24; border-color: rgba(245,158,11,0.35); }
-.badge-primary { background: rgba(99,102,241,0.15); color: #a5b4fc; border-color: rgba(99,102,241,0.40); }
-
-/* A4 sheet keeps its own printed look — but its shadow needs to be stronger on black */
-.a4-sheet {
-    box-shadow:
-        0 32px 80px -20px rgba(0, 0, 0, 1),
-        0 0 0 1px rgba(255, 255, 255, 0.12);
+.watermark-layer span {
+  font-family: var(--font-body);
+  font-size: 96px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #000000;
 }
 
-/* Paid stamp on light sheet — unchanged, but bump contrast */
-.paid-stamp { border-width: 2.5px; font-weight: 900; }
+/* ==========================================
+   PAGE HEADER (PAGES 1, 2, 3)
+   ========================================== */
+.doc-header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 8px;
+}
 
-/* Logout icon */
-#btn-logout { color: #f87171; }    
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  line-height: 0;
+}
+
+.company-name {
+  font-size: 19px;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+  font-family: var(--font-body);
+}
+
+.company-tagline {
+  font-size: 8px;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 1.2px;
+  margin-top: 2px;
+}
+
+.header-meta {
+  text-align: right;
+  font-size: 9px;
+  color: #374151;
+  line-height: 1.35;
+}
+
+.header-meta .bold {
+  font-weight: 700;
+  color: #000000;
+}
+
+.header-divider {
+  position: relative;
+  z-index: 2;
+  height: 1.5px;
+  background: #111827;
+  margin-bottom: 14px;
+}
+
+/* ==========================================
+   DOCUMENT TITLE & SUBTITLE
+   ========================================== */
+.doc-title-block {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-bottom: 20px; /* Increased from 14px */
+}
+
+.doc-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #000000;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.doc-subtitle {
+  font-size: 8.5pt;
+  font-style: italic;
+  color: #4b5563;
+}
+
+/* ==========================================
+   SECTION BLOCKS & LEGAL CLAUSES
+   ========================================== */
+.section-block {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 16px; /* Increased from 10.5px to give sections breathing room */
+}
+
+.section-heading {
+  font-size: 10pt; /* Slightly larger heading */
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 6px; /* Increased from 3px to separate heading from text */
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.section-heading span {
+  font-weight: 700;
+}
+
+.clause-text {
+  font-size: 8.8pt;
+  color: #1f2937;
+  line-height: 1.55; /* Increased from 1.38 for better readability */
+  text-align: justify;
+  margin-bottom: 8px; /* Adds space below paragraphs */
+}
+
+.clause-text strong {
+  color: #000000;
+}
+
+.bullet-list {
+  margin-top: 8px; /* Increased from 4px */
+  padding-left: 20px;
+  font-size: 8.8pt;
+  color: #1f2937;
+  line-height: 1.5; /* Increased from 1.36 */
+}
+
+.bullet-list li {
+  margin-bottom: 6px; /* Increased from 2.5px so bullet points don't clump */
+}
+
+/* ==========================================
+   TABLES (PARTIES & FEES)
+   ========================================== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 5px;
+  font-size: 8.8pt;
+  border: 1px solid #d1d5db;
+}
+
+.data-table td {
+  padding: 8px 12px; /* Increased vertical padding from 4.5px to 8px */
+  border: 1px solid #d1d5db;
+  line-height: 1.4; /* Added line-height for table cells */
+}
+
+.cell-label {
+  width: 32%;
+  background-color: #f9fafb;
+  color: #111827;
+  font-weight: 500;
+}
+
+.cell-value {
+  color: #000000;
+}
+
+.cell-value.bold {
+  font-weight: 700;
+}
+
+/* ==========================================
+   SIGNATURE BOX (PAGE 3)
+   ========================================== */
+.signature-box-container {
+  position: relative;
+  z-index: 2;
+  border: 1px solid #111827;
+  margin-top: auto;
+  margin-bottom: 6px;
+  padding: 16px 24px 12px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  background: #ffffff;
+}
+
+.sig-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.sig-img-placeholder {
+  height: 56px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  margin-bottom: 4px;
+}
+
+.founder-sig-img {
+  max-height: 52px;
+  max-width: 160px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  filter: contrast(1.05);
+}
+
+.founder-sig-img.hide,
+.cert-seal-img.hide {
+  display: none !important;
+}
+
+.sign-here-hint {
+  font-size: 7.5pt;
+  color: #94a3b8;
+  font-style: italic;
+  line-height: 1.2;
+}
+
+.sig-vector-fallback,
+.seal-vector-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sig-line {
+  border-bottom: 1px solid #111827;
+  margin-bottom: 5px;
+}
+
+.sig-title {
+  font-size: 9pt;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #000000;
+}
+
+.sig-name {
+  font-size: 8.5pt;
+  color: #374151;
+  margin-top: 1px;
+}
+
+.sig-date {
+  font-size: 8.5pt;
+  color: #374151;
+  margin-top: 2px;
+}
+
+/* Page Footers */
+.page-footer {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  font-size: 8pt;
+  color: #6b7280;
+}
+
+/* ==========================================
+   PAGE 4: CERTIFICATE OF ONBOARDING
+   ========================================== */
+.page-certificate {
+  padding: 12mm;
+  background: #ffffff;
+  display: flex;
+  align-items: stretch;
+}
+
+.cert-outer-border {
+  flex: 1;
+  border: 2px solid #111827;
+  padding: 4px;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+
+.cert-inner-border {
+  flex: 1;
+  border: 1px solid #374151;
+  padding: 24px 30px 18px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Corner Ornaments */
+.corner-ornament {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: #111827;
+  border-style: solid;
+}
+
+.corner-ornament.top-left {
+  top: 6px;
+  left: 6px;
+  border-width: 2px 0 0 2px;
+}
+
+.corner-ornament.top-right {
+  top: 6px;
+  right: 6px;
+  border-width: 2px 2px 0 0;
+}
+
+.corner-ornament.bottom-left {
+  bottom: 6px;
+  left: 6px;
+  border-width: 0 0 2px 2px;
+}
+
+.corner-ornament.bottom-right {
+  bottom: 6px;
+  right: 6px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Certificate Structural Sections for Full Page Distribution */
+.cert-section-header,
+.cert-section-recipient,
+.cert-section-message,
+.cert-section-credentials,
+.cert-bottom-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Section 1: Header & Titles */
+.cert-header-tag {
+  font-size: 8.5pt;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.cert-pill-badge {
+  background: #143521;
+  color: #ffffff;
+  padding: 4.5px 18px;
+  border-radius: 50px;
+  font-size: 7.8pt;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.cert-main-title {
+  font-family: var(--font-serif);
+  font-size: 29pt;
+  font-weight: 700;
+  color: #0b0e14;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+  line-height: 1.15;
+}
+
+.cert-subtitle {
+  font-size: 9.5pt;
+  font-weight: 600;
+  letter-spacing: 2.8px;
+  color: #4b5563;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.cert-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 220px;
+}
+
+.cert-divider .line {
+  flex: 1;
+  height: 1px;
+  background: #9ca3af;
+}
+
+.cert-divider .diamond {
+  font-size: 9pt;
+  color: #15803d;
+}
+
+/* Section 2: Recipient Presentation */
+.cert-presentation-label {
+  font-size: 8pt;
+  letter-spacing: 2px;
+  color: #6b7280;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.cert-recipient-name {
+  font-family: var(--font-serif);
+  font-size: 24pt;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1.2;
+}
+
+.cert-shop-subtitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 11.5pt;
+  color: #4b5563;
+  margin-top: 2px;
+}
+
+/* Section 3: Callout Box */
+.cert-message-box {
+  width: 100%;
+  background: #fcfdfd;
+  border: 1px solid #e2e8f0;
+  border-left: 3.5px solid #84cc16;
+  padding: 13px 18px;
+  text-align: left;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.cert-message-box .greeting {
+  font-size: 9.2pt;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 5px;
+}
+
+.cert-message-box .message-p {
+  font-size: 8.6pt;
+  color: #374151;
+  line-height: 1.44;
+  margin-bottom: 6px;
+}
+
+.cert-message-box .message-p:last-child {
+  margin-bottom: 0;
+}
+
+/* Section 4: Credentials Card */
+.credentials-card {
+  width: 100%;
+  border: 1.5px solid #1e293b;
+  border-radius: 6px;
+  background: #f8fafc;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.cred-header {
+  background: #ffffff;
+  padding: 7px 14px;
+  font-size: 9pt;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #0f172a;
+  border-bottom: 1px solid #cbd5e1;
+  text-align: center;
+}
+
+.cred-body {
+  padding: 10px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cred-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 8.8pt;
+}
+
+.cred-key {
+  font-weight: 600;
+  color: #475569;
+  font-size: 8pt;
+  letter-spacing: 0.5px;
+}
+
+.cred-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: #090d16;
+  background: #e2e8f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.cred-note {
+  padding: 6px 14px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  font-size: 7.8pt;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Section 5: Bottom Signatures & Seal (Certificate) */
+.cert-bottom-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 0 20px 4px 20px;
+  box-sizing: border-box;
+}
+
+.cert-col {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seal-placeholder,
+.sig-placeholder {
+  height: 74px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.cert-seal-img {
+  max-height: 72px;
+  max-width: 72px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  filter: contrast(1.05);
+}
+
+.cert-line {
+  width: 100%;
+  border-bottom: 1px solid #111827;
+  margin-bottom: 4px;
+}
+
+.cert-sign-title {
+  font-size: 8.5pt;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #000000;
+}
+
+.cert-sign-meta {
+  font-size: 8pt;
+  color: #4b5563;
+}   
+     /* Agreement builder — form panel + document frame */
+#view-agreement .agreement-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap: 24px;
+  align-items: start;
+}
+
+#view-agreement .document-container {
+  padding: 10px 0;
+  gap: 24px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+#view-agreement .agreement-form-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-radius: var(--radius-lg);
+}
+
+#view-agreement .ag-upload-preview {
+  width: 100%; height: 130px;
+  background: rgba(255,255,255,0.03);
+  border: 1px dashed var(--glass-border-light);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 8px; overflow: hidden;
+}
+#view-agreement .ag-upload-preview img {
+  max-width: 90%; max-height: 90%; object-fit: contain;
+}
+
+#view-agreement .ag-action-bar { display: flex; gap: 10px; }   
     </style>
 </head>
 <body>
@@ -1076,6 +1712,9 @@
             <a href="#clients" class="dock-item" data-nav="clients" data-tooltip="Client Directory">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </a>
+            <a href="#agreement" class="dock-item" data-nav="agreement" data-tooltip="Agreement & Certificate">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 3v5h5"/></svg>
+</a>
             <a href="#expenses" class="dock-item" data-nav="expenses" data-tooltip="Expenses & Renewals">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </a>
@@ -1092,12 +1731,15 @@
             <!-- Top Navbar -->
             <header class="top-navbar">
                 <div class="brand-pill">
-                    <div class="brand-badge">SS</div>
-                    <div>
-                        <h2 style="font-size: 18px;" id="header-biz-name">ShopSteward.in</h2>
-                        <span style="font-size: 11.5px; color: var(--text-muted);">Executive GST Billing & Accounting</span>
-                    </div>
-                </div>
+    <div class="brand-badge" id="top-nav-badge" style="overflow: hidden; padding: 0;">
+        <span id="top-nav-badge-text">SS</span>
+        <img id="top-nav-badge-img" src="" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #ffffff; border-radius: 11px;">
+    </div>
+    <div>
+        <h2 style="font-size: 18px;" id="header-biz-name">ShopSteward.in</h2>
+        <span style="font-size: 11.5px; color: var(--text-muted);">Executive GST Billing & Accounting</span>
+    </div>
+</div>
 
                 <div style="display: flex; gap: 12px; align-items: center;">
                     <a href="#create" class="btn btn-primary" onclick="resetInvoiceBuilder()">
@@ -1249,7 +1891,7 @@
                         <h1>Professional A4 Invoice Builder</h1>
                     </div>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-outline" onclick="window.print()">
+                        <button class="btn btn-outline" onclick="printInvoice()">
                             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                             Print A4 / Save PDF
                         </button>
@@ -1536,6 +2178,10 @@
                             <input type="text" id="client-name" class="input-liquid" placeholder="Rob & Joe Traders">
                         </div>
                         <div class="form-group">
+    <label class="form-label">Owner / Contact Name</label>
+    <input type="text" id="client-owner-name" class="input-liquid" placeholder="Client Name">
+</div>
+                        <div class="form-group">
                             <label class="form-label">Phone Number</label>
                             <input type="text" id="client-phone" class="input-liquid" placeholder="+91 9876543210">
                         </div>
@@ -1551,6 +2197,12 @@
                             <label class="form-label">Full Address</label>
                             <textarea id="client-address" class="input-liquid" rows="2" placeholder="Street, City, State, PIN"></textarea>
                         </div>
+                                                <label style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--radius-md); background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); cursor: pointer; margin-top: 6px;">
+                            <input type="checkbox" id="client-auto-agreement" checked style="width: 16px; height: 16px; cursor: pointer;">
+                            <span style="font-size: 12.5px; color: #a5b4fc; font-weight: 600;">
+                                Auto-generate Service Agreement &amp; Certificate
+                            </span>
+                        </label>
                         <button class="btn btn-primary" onclick="saveNewClient()" style="margin-top: 6px;">
                             + Save Client to Directory
                         </button>
@@ -1764,9 +2416,583 @@
                         </div>
                     </div>
 
+                                            <div class="liquid-glass" style="padding: 24px; border-radius: var(--radius-lg);">
+                            <label class="form-label" style="margin-bottom: 8px; display: block;">Official Seal (for Certificate)</label>
+                            <div style="width: 100%; height: 130px; background: rgba(255,255,255,0.03); border: 1px dashed var(--glass-border-light); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden;">
+                                <img id="preview-seal-img" style="max-width: 90%; max-height: 90%; object-fit: contain; display: none;">
+                                <span id="seal-empty-txt" style="font-size: 12px; color: var(--text-muted);">No Seal Uploaded</span>
+                            </div>
+                            <input type="file" id="upload-seal-file" accept="image/*" class="input-liquid" style="font-size: 12px;">
+                        </div>
+
                 </div>
             </section>
+            
+            <!-- ============================================================
+                 VIEW 7: SERVICE AGREEMENT & ONBOARDING CERTIFICATE
+                 ============================================================ -->
+            <section id="view-agreement" class="view-pane">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <a href="#clients" style="color: var(--text-muted); font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">← Back to Clients</a>
+                        <h1>Service Agreement &amp; Certificate</h1>
+                        <p style="color: var(--text-muted); font-size: 13.5px; margin-top: 4px;">Generates the 3-page legal agreement plus the branded onboarding certificate</p>
+                    </div>
+                    <div class="ag-action-bar">
+                        <button class="btn btn-outline" onclick="printAgreement()">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                            Print 4-Page PDF
+                        </button>
+                        <button class="btn btn-success" id="btn-save-agreement" onclick="saveAgreementToSupabase()">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            Save Agreement
+                        </button>
+                    </div>
+                </div>
 
+                <div class="agreement-form-grid">
+                    <!-- LEFT: FORM -->
+                    <div class="liquid-glass agreement-form-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="font-size: 15px;">Client &amp; Account</h3>
+                            <button class="btn btn-outline btn-sm" onclick="resetAgreementForm()">Reset</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Load from Client Directory</label>
+                            <select id="ag-client-select" class="input-liquid" onchange="agLoadClient(this.value)">
+                                <option value="">-- Manual / Direct Entry --</option>
+                            </select>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                            <div class="form-group">
+                                <label class="form-label">Shop Name</label>
+                                <input type="text" id="ag-shop" class="input-liquid" value="Ghosh Medical">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Owner Name</label>
+                                <input type="text" id="ag-owner" class="input-liquid" value="Dibakar Ghosh">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="text" id="ag-phone" class="input-liquid" value="+91 8145990555">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Shop Address</label>
+                            <textarea id="ag-address" class="input-liquid" rows="2">Paleswar Super Market, Nadia, 741101</textarea>
+                        </div>
+
+                        <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px;">
+                            <h3 style="font-size: 14px; margin-bottom: 12px;">Login Credentials</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                                <div class="form-group">
+                                    <label class="form-label">User ID</label>
+                                    <input type="text" id="ag-user-id" class="input-liquid mono" value="ghoshmedical">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Password</label>
+                                    <input type="text" id="ag-password" class="input-liquid mono" value="GM@2026#secure">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 12px;">
+                                <label class="form-label">Login URL</label>
+                                <input type="text" id="ag-login-url" class="input-liquid mono" value="shopsteward.in/login">
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px;">
+                            <h3 style="font-size: 14px; margin-bottom: 12px;">Plan &amp; Date</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                                <div class="form-group">
+                                    <label class="form-label">Agreement Date</label>
+                                    <input type="date" id="ag-date" class="input-liquid">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Tier</label>
+                                    <input type="text" id="ag-tier" class="input-liquid" value="Base (Tier 1)">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Setup Fee</label>
+                                    <input type="text" id="ag-setup-fee" class="input-liquid" value="₹ 1,999">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Annual Fee</label>
+                                    <input type="text" id="ag-annual-fee" class="input-liquid" value="₹ 599 / year">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px;">
+                            <label class="form-label">Client Signature (Optional PNG)</label>
+                            <input type="file" id="ag-upload-client-sig" accept="image/*" class="input-liquid" style="font-size: 12px;">
+                            <div class="ag-upload-preview" id="ag-client-sig-preview">
+                                <span style="font-size: 12px; color: var(--text-muted);">No signature uploaded</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: A4 PREVIEW -->
+                    <div class="invoice-preview-wrapper" style="position: sticky; top: 10px;">
+                        <div class="document-container" id="agreement-doc">
+                             <!-- ================= PAGE 1 ================= -->
+    <section class="page page-a4" id="page-1">
+      <div class="watermark-layer" aria-hidden="true">
+        <span>ShopSteward</span>
+        <span>ShopSteward</span>
+        <span>ShopSteward</span>
+      </div>
+
+      <!-- Page Header -->
+      <div class="doc-header">
+        <div class="header-brand">
+          <div class="brand-logo">
+            <svg viewBox="0 0 64 64" width="38" height="38">
+              <circle cx="32" cy="32" r="32" fill="#000000"/>
+              <circle cx="32" cy="22" r="8.5" stroke="#c8ff3d" stroke-width="4.5" fill="none"/>
+              <line x1="32" y1="30" x2="32" y2="52" stroke="#c8ff3d" stroke-width="4.5" stroke-linecap="round"/>
+              <line x1="32" y1="41" x2="41" y2="41" stroke="#c8ff3d" stroke-width="4.5" stroke-linecap="round"/>
+              <line x1="32" y1="47" x2="39" y2="47" stroke="#c8ff3d" stroke-width="4.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1 class="company-name">ShopSteward</h1>
+            <p class="company-tagline">CUSTOM SHOP SOFTWARE</p>
+          </div>
+        </div>
+        <div class="header-meta">
+          <div class="meta-item bold">www.shopsteward.in</div>
+          <div class="meta-item">+91 86375 60557</div>
+          <div class="meta-item">shopsteward.in@gmail.com</div>
+        </div>
+      </div>
+      <div class="header-divider"></div>
+
+      <!-- Document Title -->
+      <div class="doc-title-block">
+        <h2 class="doc-title">SERVICE AGREEMENT</h2>
+        <p class="doc-subtitle">This document constitutes a legally binding agreement between ShopSteward and the Client.</p>
+      </div>
+
+      <!-- Clause 01: The Parties -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>01.</span> The Parties</h3>
+        <p class="clause-text">This Agreement is made between <strong>ShopSteward</strong> ("The Provider") and the Client detailed below:</p>
+        
+        <table class="data-table">
+          <tbody>
+            <tr>
+              <td class="cell-label">Shop Name</td>
+              <td class="cell-value sync-shop-name">Ghosh Medical</td>
+            </tr>
+            <tr>
+              <td class="cell-label">Owner Name</td>
+              <td class="cell-value sync-owner-name">Dibakar Ghosh</td>
+            </tr>
+            <tr>
+              <td class="cell-label">Phone Number</td>
+              <td class="cell-value sync-phone">+91 8145990555</td>
+            </tr>
+            <tr>
+              <td class="cell-label">Shop Address</td>
+              <td class="cell-value sync-address">Paleswar Super Market, Nadia, 741101</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Clause 02: The Offer -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>02.</span> The Offer</h3>
+        <p class="clause-text">The Provider agrees to give the Client access to the <strong>ShopSteward Custom Web App</strong> (Billing, Inventory, and Udhaar Tracking) for the duration specified in the payment terms below.</p>
+      </div>
+
+      <!-- Clause 03: Plan Details & Fees -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>03.</span> Plan Details & Fees</h3>
+        <table class="data-table">
+          <tbody>
+            <tr>
+              <td class="cell-label">Selected Tier</td>
+              <td class="cell-value bold sync-tier">Base (Tier 1)</td>
+            </tr>
+            <tr>
+              <td class="cell-label">One-Time Setup Amount</td>
+              <td class="cell-value bold sync-setup-fee">₹ 1,999</td>
+            </tr>
+            <tr>
+              <td class="cell-label">Annual Subscription Amount</td>
+              <td class="cell-value bold sync-annual-fee">₹ 599 / year</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Clause 04: Terms and Conditions -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>04.</span> Terms and Conditions</h3>
+        <p class="clause-text">The Client agrees to all Terms and Conditions, Privacy Policy, and Refund Policy available on the official website (<strong>shopsteward.in</strong>). The Client acknowledges that they have read and understood these policies before signing this agreement.</p>
+      </div>
+
+      <!-- Clause 05: Support Policy -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>05.</span> Support Policy</h3>
+        <p class="clause-text">The Provider will provide initial setup and unlimited WhatsApp support for the duration of the subscription period. Support will be available between <strong>10:00 AM and 6:00 PM</strong>. The Client agrees not to misuse support channels for trivial matters or outside these hours.</p>
+      </div>
+
+      <!-- Clause 06: Renewal Policy -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>06.</span> Renewal Policy</h3>
+        <p class="clause-text">After the initial subscription period ends, the software will automatically switch to the prevailing annual subscription rate for the selected plan, unless the Client chooses to upgrade or discontinue the service.</p>
+      </div>
+
+      <!-- Clause 07: Usage & Early Termination -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>07.</span> Usage & Early Termination</h3>
+        <p class="clause-text">This service is intended for active businesses. If the Client does not log in or use the software for <strong>30 consecutive days</strong>, the Provider reserves the right to suspend the account to maintain server resources.</p>
+      </div>
+
+      <!-- Clause 08: Hardware & Internet Requirements -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>08.</span> Hardware & Internet Requirements</h3>
+        <p class="clause-text">The Client must have a working smartphone, tablet, or computer, and an active internet connection to use the software. The Provider is not responsible for issues arising from the Client's lack of hardware or internet connectivity.</p>
+      </div>
+
+      <div class="page-footer">
+        <span>Service Agreement &bull; ShopSteward</span>
+        <span>Page 1 of 3</span>
+      </div>
+    </section>
+
+
+    <!-- ================= PAGE 2 ================= -->
+    <section class="page page-a4" id="page-2">
+      <div class="watermark-layer" aria-hidden="true">
+        <span>ShopSteward</span>
+        <span>ShopSteward</span>
+        <span>ShopSteward</span>
+      </div>
+
+      <!-- Page Header -->
+      <div class="doc-header">
+        <div class="header-brand">
+          <div class="brand-logo">
+            <svg viewBox="0 0 64 64" width="38" height="38">
+              <circle cx="32" cy="32" r="32" fill="#000000"/>
+              <circle cx="32" cy="22" r="8.5" stroke="#c8ff3d" stroke-width="4.5" fill="none"/>
+              <line x1="32" y1="30" x2="32" y2="52" stroke="#c8ff3d" stroke-width="4.5" stroke-linecap="round"/>
+              <line x1="32" y1="41" x2="41" y2="41" stroke="#c8ff3d" stroke-width="4.5" stroke-linecap="round"/>
+              <line x1="32" y1="47" x2="39" y2="47" stroke="#c8ff3d" stroke-width="4.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1 class="company-name">ShopSteward</h1>
+            <p class="company-tagline">CUSTOM SHOP SOFTWARE</p>
+          </div>
+        </div>
+        <div class="header-meta">
+          <div class="meta-item bold">www.shopsteward.in</div>
+          <div class="meta-item">+91 86375 60557</div>
+          <div class="meta-item">shopsteward.in@gmail.com</div>
+        </div>
+      </div>
+      <div class="header-divider"></div>
+
+      <!-- Clause 09: Data Ownership & Backup -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>09.</span> Data Ownership & Backup</h3>
+        <p class="clause-text">All business data entered by the Client belongs to the Client. ShopSteward provides 24-hour automatic backups. However, the Client is advised to download a full data backup once a month via the settings menu to ensure data safety.</p>
+      </div>
+
+      <!-- Clause 10: Breach of Agreement -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>10.</span> Breach of Agreement</h3>
+        <p class="clause-text"><strong>Strictly Enforced:</strong> If the Client is found committing fraud, providing false information, misrepresenting their business, or refusing to comply with the terms of this Agreement after signing, the Provider reserves the right to:</p>
+        <ul class="bullet-list">
+          <li>Immediately terminate all access to the software without notice.</li>
+          <li>Permanently blacklist the Client from any future ShopSteward services.</li>
+          <li>Initiate legal proceedings under applicable Indian laws to recover damages, costs, and legal fees incurred by the Provider due to such breach.</li>
+        </ul>
+      </div>
+
+      <!-- Clause 11: Intellectual Property Rights -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>11.</span> Intellectual Property Rights</h3>
+        <p class="clause-text">All software, source code, design, user interface, branding, and intellectual property associated with the ShopSteward platform belong exclusively to <strong>ShopSteward</strong>. The Client is granted a limited, non-exclusive, non-transferable license to use the software for the duration of their subscription. The Client's business data remains the sole property of the Client.</p>
+      </div>
+
+      <!-- Clause 12: Limitation of Liability -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>12.</span> Limitation of Liability</h3>
+        <p class="clause-text">ShopSteward's total cumulative liability arising from or related to this Agreement shall not exceed the total amount paid by the Client for the current subscription period. In no event shall ShopSteward be liable for any indirect, incidental, consequential, or punitive damages, including but not limited to loss of profits, loss of business, or loss of data.</p>
+      </div>
+
+      <!-- Clause 13: Confidentiality -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>13.</span> Confidentiality</h3>
+        <p class="clause-text">Both parties agree to keep all business, financial, and technical information shared during the course of this Agreement strictly confidential. This obligation shall survive the termination of this Agreement.</p>
+      </div>
+
+      <!-- Clause 14: Force Majeure -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>14.</span> Force Majeure</h3>
+        <p class="clause-text">Neither party shall be held liable for any delay or failure in performance caused by events beyond their reasonable control, including but not limited to natural disasters, government actions, power failures, or widespread internet outages.</p>
+      </div>
+
+      <!-- Clause 15: Third-Party Integrations -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>15.</span> Third-Party Integrations</h3>
+        <p class="clause-text">The ShopSteward platform relies on certain third-party service providers for hosting, payment processing, and AI functionality. While we choose reliable partners, occasional downtime or service interruptions from these third parties are outside our direct control.</p>
+      </div>
+
+      <!-- Clause 16: Service Uptime & Maintenance -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>16.</span> Service Uptime & Maintenance</h3>
+        <p class="clause-text">We aim for 99% service uptime. However, scheduled maintenance may cause temporary disruptions, usually during low-peak hours. We will make reasonable efforts to notify clients of any planned maintenance.</p>
+      </div>
+
+      <div class="page-footer">
+        <span>Service Agreement &bull; ShopSteward</span>
+        <span>Page 2 of 3</span>
+      </div>
+    </section>
+
+
+    <!-- ================= PAGE 3 ================= -->
+    <section class="page page-a4" id="page-3">
+      <div class="watermark-layer" aria-hidden="true">
+        <span>ShopSteward</span>
+        <span>ShopSteward</span>
+        <span>ShopSteward</span>
+      </div>
+
+      <!-- Page Header -->
+      <div class="doc-header">
+        <div class="header-brand">
+          <div class="brand-logo">
+            <svg viewBox="0 0 64 64" width="38" height="38">
+              <circle cx="32" cy="32" r="32" fill="#000000"/>
+              <circle cx="32" cy="22" r="8.5" stroke="#c8ff3d" stroke-width="4.5" fill="none"/>
+              <line x1="32" y1="30" x2="32" y2="52" stroke="#c8ff3d" stroke-width="4.5" stroke-linecap="round"/>
+              <line x1="32" y1="41" x2="41" y2="41" stroke="#c8ff3d" stroke-width="4.5" stroke-linecap="round"/>
+              <line x1="32" y1="47" x2="39" y2="47" stroke="#c8ff3d" stroke-width="4.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1 class="company-name">ShopSteward</h1>
+            <p class="company-tagline">CUSTOM SHOP SOFTWARE</p>
+          </div>
+        </div>
+        <div class="header-meta">
+          <div class="meta-item bold">www.shopsteward.in</div>
+          <div class="meta-item">+91 86375 60557</div>
+          <div class="meta-item">shopsteward.in@gmail.com</div>
+        </div>
+      </div>
+      <div class="header-divider"></div>
+
+      <!-- Clause 17: Data Export & Deletion Policy -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>17.</span> Data Export & Deletion Policy</h3>
+        <p class="clause-text">Upon termination of this Agreement, the Client has 30 days to export their data from the application. After 30 days, the data will be permanently deleted from our servers unless a longer retention period is required by law.</p>
+      </div>
+
+      <!-- Clause 18: Refund Policy -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>18.</span> Refund Policy</h3>
+        <p class="clause-text">Setup fees are non-refundable once development begins. Annual subscriptions are non-refundable, but the Client may choose not to renew for the next year.</p>
+      </div>
+
+      <!-- Clause 19: Price Changes -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>19.</span> Price Changes</h3>
+        <p class="clause-text">ShopSteward reserves the right to change the annual subscription fee for the next renewal cycle. Clients will be notified at least 30 days in advance of any such change.</p>
+      </div>
+
+      <!-- Clause 20: Training & Onboarding -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>20.</span> Training & Onboarding</h3>
+        <p class="clause-text">The setup fee includes initial configuration, data import (up to a reasonable limit), and basic training provided during the delivery of the web app. An optional tutorial will be provided upon request.</p>
+      </div>
+
+      <!-- Clause 21: Support Scope -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>21.</span> Support Scope</h3>
+        <p class="clause-text">Support does not include hardware troubleshooting, internet connectivity issues, or custom development requests beyond the original scope. Such requests will be quoted separately.</p>
+      </div>
+
+      <!-- Clause 22: Additional Changes After 7 Days -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>22.</span> Additional Changes After 7 Days</h3>
+        <p class="clause-text">Any changes, modifications, or additional features requested by the Client after 7 days from the date of delivery will be quoted and charged separately.</p>
+      </div>
+
+      <!-- Clause 23: Governing Law & Jurisdiction -->
+      <div class="section-block">
+        <h3 class="section-heading"><span>23.</span> Governing Law & Jurisdiction</h3>
+        <p class="clause-text">This Agreement is governed by the laws of India. Any dispute arising from or related to this Agreement shall be subject to the exclusive jurisdiction of the courts in <strong>Medinipur, West Bengal</strong>.</p>
+      </div>
+
+      <!-- Signatures Box -->
+      <div class="signature-box-container">
+        <div class="sig-column">
+          <div class="sig-img-placeholder" id="clientSigSlot">
+            <span class="sign-here-hint no-print">Click 'Edit Details' above to upload signature, or sign by hand</span>
+          </div>
+          <div class="sig-line"></div>
+          <div class="sig-title">CLIENT SIGNATURE</div>
+          <div class="sig-date">Date: <span class="sync-date-line">____________________</span></div>
+        </div>
+
+        <div class="sig-column">
+          <div class="sig-img-placeholder" id="founderSigSlot1">
+            <img src="signature.png" alt="Founder Signature" class="founder-sig-img" onerror="this.style.display='none'; document.getElementById('founderSigFallback1').style.display='flex';">
+            <div id="founderSigFallback1" class="sig-vector-fallback" style="display:none;">
+              <svg viewBox="0 0 200 50" width="150" height="42">
+                <path d="M 15 35 Q 35 5 50 32 T 78 20 T 105 38 T 135 15 T 165 28 T 185 30" stroke="#0f172a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                <path d="M 25 42 Q 85 45 155 35" stroke="#0f172a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="sig-line"></div>
+          <div class="sig-title">FOUNDER SIGNATURE</div>
+          <div class="sig-name">Samiran Das, Founder</div>
+          <div class="sig-date">Date: <span class="sync-date-line">____________________</span></div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <span>Service Agreement &bull; ShopSteward</span>
+        <span>Page 3 of 3</span>
+      </div>
+    </section>
+
+
+    <!-- ================= PAGE 4: CERTIFICATE ================= -->
+    <section class="page page-a4 page-certificate" id="page-4">
+      <div class="cert-outer-border">
+        <div class="cert-inner-border">
+          
+          <!-- Corner Ornaments -->
+          <div class="corner-ornament top-left"></div>
+          <div class="corner-ornament top-right"></div>
+          <div class="corner-ornament bottom-left"></div>
+          <div class="corner-ornament bottom-right"></div>
+
+          <!-- Section 1: Header & Titles -->
+          <div class="cert-section-header">
+            <div class="cert-header-tag">SHOPSTEWARD &bull; OFFICIAL DOCUMENT</div>
+            <div class="cert-pill-badge">CERTIFICATE OF ONBOARDING</div>
+            <h2 class="cert-main-title">Welcome to the Family</h2>
+            <div class="cert-subtitle">PRESENTED WITH HONOUR &amp; TRUST</div>
+            <div class="cert-divider">
+              <span class="line"></span>
+              <span class="diamond">&#9670;</span>
+              <span class="line"></span>
+            </div>
+          </div>
+
+          <!-- Section 2: Recipient Presentation -->
+          <div class="cert-section-recipient">
+            <div class="cert-presentation-label">THIS CERTIFICATE IS PROUDLY PRESENTED TO</div>
+            <div class="cert-recipient-name sync-owner-name">Dibakar Ghosh</div>
+            <div class="cert-shop-subtitle">of <span class="sync-shop-name">Ghosh Medical</span></div>
+          </div>
+
+          <!-- Section 3: Congratulatory Letter Callout -->
+          <div class="cert-section-message">
+            <div class="cert-message-box">
+              <p class="greeting">Dear <span class="sync-owner-name">Dibakar Ghosh</span>,</p>
+              <p class="message-p">
+                We are deeply honoured to welcome you to the ShopSteward family. Every shop owner who trusts us is not just a client &mdash; you are a partner in our journey. Behind every shop is years of hard work, sleepless nights, and a meaningful dream. We consider it our privilege to be a small part of that story.
+              </p>
+              <p class="message-p">
+                Your success is our success. This certificate marks the beginning of a long and trusted relationship.
+              </p>
+            </div>
+          </div>
+
+          <!-- Section 4: Login Credentials Card -->
+          <div class="cert-section-credentials">
+            <div class="credentials-card">
+              <div class="cred-header">
+                <span class="lock-icon">&#128272;</span> YOUR LOGIN CREDENTIALS
+              </div>
+              <div class="cred-body">
+                <div class="cred-row">
+                  <span class="cred-key">USER ID</span>
+                  <span class="cred-value sync-user-id">ghoshmedical</span>
+                </div>
+                <div class="cred-row">
+                  <span class="cred-key">PASSWORD</span>
+                  <span class="cred-value sync-password">GM@2026#secure</span>
+                </div>
+                <div class="cred-row">
+                  <span class="cred-key">LOGIN URL</span>
+                  <span class="cred-value sync-login-url">shopsteward.in/login</span>
+                </div>
+              </div>
+              <div class="cred-note">
+                <span class="warn-icon">&#9888;&#65039;</span> These credentials are permanently set by ShopSteward and cannot be changed.
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Certificate Seal & Founder Signature Footer -->
+          <div class="cert-bottom-row">
+            
+            <!-- Seal Column -->
+            <div class="cert-col">
+              <div class="seal-placeholder" id="officialSealSlot">
+                <img src="seal.png" alt="Official Seal" class="cert-seal-img" onerror="this.style.display='none'; document.getElementById('sealFallback').style.display='flex';">
+                <div id="sealFallback" class="seal-vector-fallback" style="display:none;">
+                  <svg viewBox="0 0 100 100" width="60" height="60">
+                    <circle cx="50" cy="50" r="46" stroke="#15803d" stroke-width="2.5" fill="#f0fdf4" stroke-dasharray="3 2"/>
+                    <circle cx="50" cy="50" r="38" stroke="#15803d" stroke-width="1.2" fill="none"/>
+                    <path id="curve" d="M 22 50 A 28 28 0 1 1 78 50" fill="none"/>
+                    <text font-size="7.5" fill="#15803d" font-weight="700" letter-spacing="1">
+                      <textPath href="#curve" startOffset="50%" text-anchor="middle">SHOPSTEWARD</textPath>
+                    </text>
+                    <circle cx="50" cy="50" r="16" fill="#15803d"/>
+                    <text x="50" y="53" font-size="8" fill="#ffffff" font-weight="700" text-anchor="middle">SEAL</text>
+                  </svg>
+                </div>
+              </div>
+              <div class="cert-line"></div>
+              <div class="cert-sign-title">OFFICIAL SEAL</div>
+              <div class="cert-sign-meta">www.shopsteward.in</div>
+            </div>
+
+            <!-- Founder Signature Column -->
+            <div class="cert-col">
+              <div class="sig-placeholder" id="founderSigSlot2">
+                <img src="signature.png" alt="Founder Signature" class="founder-sig-img" onerror="this.style.display='none'; document.getElementById('founderSigFallback2').style.display='flex';">
+                <div id="founderSigFallback2" class="sig-vector-fallback" style="display:none;">
+                  <svg viewBox="0 0 200 50" width="150" height="42">
+                    <path d="M 15 35 Q 35 5 50 32 T 78 20 T 105 38 T 135 15 T 165 28 T 185 30" stroke="#0f172a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                    <path d="M 25 42 Q 85 45 155 35" stroke="#0f172a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="cert-line"></div>
+              <div class="cert-sign-title">FOUNDER SIGNATURE</div>
+              <div class="cert-sign-meta">Samiran Das, Founder</div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
         </main>
     </div>
 
@@ -1825,9 +3051,10 @@
             if (!window.location.hash) window.location.hash = '#dashboard';
             handleRoute();
             
-            loadProfile();
+                        loadProfile();
             loadAllData();
             loadClients();
+            loadAgreements();
         }
 
         document.getElementById('btn-login').addEventListener('click', async () => {
@@ -1888,6 +3115,9 @@
             if (currentPane) {
                 currentPane.classList.add('active');
             }
+                        if (hash === 'agreement') {
+                refreshAgreementClientSelect();
+            }
 
             if (hash === 'dashboard' && analyticsChart) {
                 analyticsChart.resize();
@@ -1917,21 +3147,62 @@
                 document.getElementById('prof-upi-id').value = data.upi_id || '8637560557@upi';
                 document.getElementById('prof-terms').value = data.default_terms || '';
 
-                if (data.logo_url) {
+                               if (data.logo_url) {
+                    // 1. Update Settings Preview & Invoice
                     document.getElementById('preview-logo-img').src = data.logo_url;
                     document.getElementById('preview-logo-img').style.display = 'block';
                     document.getElementById('logo-empty-txt').style.display = 'none';
                     document.getElementById('a4-logo').src = data.logo_url;
                     document.getElementById('a4-logo').style.display = 'block';
+
+                    // 2. Update Top Navbar Badge
+                    const navImg = document.getElementById('top-nav-badge-img');
+                    const navText = document.getElementById('top-nav-badge-text');
+                    if (navImg && navText) {
+                        navImg.src = data.logo_url;
+                        navImg.style.display = 'block';
+                        navText.style.display = 'none';
+                        // Remove the gradient background so the logo stands out cleanly
+                        document.getElementById('top-nav-badge').style.background = 'transparent';
+                        document.getElementById('top-nav-badge').style.boxShadow = '0 4px 15px rgba(255, 255, 255, 0.1)';
+                    }
+                } else {
+                    // Fallback if no logo is uploaded
+                    const navImg = document.getElementById('top-nav-badge-img');
+                    const navText = document.getElementById('top-nav-badge-text');
+                    if (navImg && navText) {
+                        navImg.style.display = 'none';
+                        navText.style.display = 'block';
+                        document.getElementById('top-nav-badge').style.background = 'linear-gradient(135deg, #4f46e5 0%, #0d9488 100%)';
+                    }
                 }
 
-                if (data.signature_url) {
+                               if (data.signature_url) {
                     document.getElementById('preview-sig-img').src = data.signature_url;
                     document.getElementById('preview-sig-img').style.display = 'block';
                     document.getElementById('sig-empty-txt').style.display = 'none';
                     document.getElementById('a4-signature').src = data.signature_url;
                     document.getElementById('a4-signature').style.display = 'block';
+
+                    // NEW: Update the agreement pages with the uploaded signature
+                    const founderSig1 = document.getElementById('founderSigSlot1');
+                    if (founderSig1) founderSig1.innerHTML = `<img src="${data.signature_url}" alt="Founder Signature" class="founder-sig-img">`;
+                    
+                    const founderSig2 = document.getElementById('founderSigSlot2');
+                    if (founderSig2) founderSig2.innerHTML = `<img src="${data.signature_url}" alt="Founder Signature" class="founder-sig-img">`;
                 }
+                              if (data.seal_url) {
+                    const sealSlot = document.getElementById('officialSealSlot');
+                    if (sealSlot) {
+                        sealSlot.innerHTML = `<img src="${data.seal_url}" alt="Official Seal" class="cert-seal-img">`;
+                    }
+                    const sealPrev = document.getElementById('preview-seal-img');
+                    if (sealPrev) {
+                        sealPrev.src = data.seal_url;
+                        sealPrev.style.display = 'block';
+                        document.getElementById('seal-empty-txt').style.display = 'none';
+                    }
+                }  
             } else {
                 // Initialize default profile row if none exists
                 const initialProfile = {
@@ -2002,6 +3273,19 @@
             loadProfile();
         });
 
+                document.getElementById('upload-seal-file')?.addEventListener('change', async (e) => {
+            if (!currentUser) return;
+            const file = e.target.files[0];
+            if (!file) return;
+            const path = `${currentUser.id}/seal_${Date.now()}.png`;
+            const { error } = await sb.storage.from('branding').upload(path, file, { upsert: true });
+            if (error) return alert('Seal upload error: ' + error.message);
+            const { data: pub } = sb.storage.from('branding').getPublicUrl(path);
+            await sb.from('profiles').upsert({ id: currentUser.id, seal_url: pub.publicUrl });
+            alert('Seal uploaded!');
+            loadProfile();
+        });
+
         document.getElementById('upload-sig-file').addEventListener('change', async (e) => {
             if (!currentUser) return;
             const file = e.target.files[0];
@@ -2041,42 +3325,82 @@
                         <td style="font-size:12px; color:var(--text-muted);">${c.address || '-'}</td>
                         <td style="text-align: right; white-space: nowrap;">
                             <button class="btn btn-outline btn-sm" onclick="pickClientForInvoice('${c.id}')" style="margin-right: 6px;">Bill Client</button>
+                            <button class="btn btn-outline btn-sm" onclick="pickClientForAgreement('${c.id}')" style="margin-right: 6px;">Agreement</button>
                             <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">Delete</button>
                         </td>
                     </tr>
                 `;
             });
 
-            if (allClients.length === 0) {
+                       if (allClients.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--text-muted);">No clients registered yet.</td></tr>`;
+            }
+
+            if (typeof refreshAgreementClientSelect === 'function') {
+                refreshAgreementClientSelect();
             }
         }
 
-        async function saveNewClient() {
+                async function saveNewClient() {
             if (!currentUser) return;
             const name = document.getElementById('client-name').value.trim();
             if (!name) return alert("Please enter Client Name.");
 
+            const shouldAutoCreateAgreement =
+                document.getElementById('client-auto-agreement').checked;
+
             const clientData = {
                 user_id: currentUser.id,
                 name: name,
+                owner_name: document.getElementById('client-owner-name').value.trim(),
                 phone: document.getElementById('client-phone').value.trim(),
                 email: document.getElementById('client-email').value.trim(),
                 gstin: document.getElementById('client-gstin').value.trim(),
                 address: document.getElementById('client-address').value.trim()
             };
 
-            const { error } = await sb.from('clients').insert([clientData]);
+            const { data: inserted, error } = await sb
+                .from('clients')
+                .insert([clientData])
+                .select()
+                .single();
+
             if (error) {
                 alert("Error saving client: " + error.message);
+                return;
+            }
+
+            ['client-name', 'client-owner-name', 'client-phone', 'client-email',
+             'client-gstin', 'client-address'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+
+            await loadClients();
+
+            if (shouldAutoCreateAgreement) {
+                try {
+                    const agreement = await autoCreateAgreementForClient(inserted);
+                    const goToIt = confirm(
+                        `Client saved and agreement auto-generated.\n\n` +
+                        `User ID: ${agreement.login_user_id}\n` +
+                        `Password: ${agreement.login_password}\n\n` +
+                        `Open the agreement now to print & sign it?`
+                    );
+                    if (goToIt) {
+                        await loadAgreements();
+                        pickClientForAgreement(inserted.id);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert(
+                        "Client saved, but the agreement could not be generated:\n" +
+                        err.message +
+                        "\n\nYou can create it manually from the client row."
+                    );
+                }
             } else {
                 alert("Client added successfully!");
-                document.getElementById('client-name').value = '';
-                document.getElementById('client-phone').value = '';
-                document.getElementById('client-email').value = '';
-                document.getElementById('client-gstin').value = '';
-                document.getElementById('client-address').value = '';
-                loadClients();
             }
         }
 
@@ -2786,6 +4110,295 @@ gradExp.addColorStop(1, 'rgba(239, 68, 68, 0.0)');      // ← changed
             const el = document.getElementById(id);
             if (el) el.addEventListener('input', renderInvoicePreview);
         });
+
+        /* ============================================================
+   9. AGREEMENTS MODULE
+   ============================================================ */
+let allAgreements = [];
+
+const AG_SYNC = {
+    'ag-shop':       ['.sync-shop-name'],
+    'ag-owner':      ['.sync-owner-name'],
+    'ag-phone':      ['.sync-phone'],
+    'ag-address':    ['.sync-address'],
+    'ag-user-id':    ['.sync-user-id'],
+    'ag-password':   ['.sync-password'],
+    'ag-login-url':  ['.sync-login-url'],
+    'ag-tier':       ['.sync-tier'],
+    'ag-setup-fee':  ['.sync-setup-fee'],
+    'ag-annual-fee': ['.sync-annual-fee'],
+};
+
+Object.entries(AG_SYNC).forEach(([inputId, selectors]) => {
+    const el = document.getElementById(inputId);
+    if (!el) return;
+    el.addEventListener('input', () => {
+        selectors.forEach(sel => {
+            document.querySelectorAll(sel).forEach(node => {
+                // If Owner Name is empty, fallback to Shop Name
+                if (inputId === 'ag-owner') {
+                    const ownerVal = el.value.trim();
+                    const shopVal = document.getElementById('ag-shop').value.trim();
+                    node.textContent = ownerVal || shopVal || 'Client Name';
+                } else {
+                    node.textContent = el.value;
+                }
+            });
+        });
+    });
+});
+
+document.getElementById('ag-date')?.addEventListener('input', () => {
+    const v = document.getElementById('ag-date').value;
+    document.querySelectorAll('.sync-date-line').forEach(node => {
+        node.textContent = v || '____________________';
+    });
+});
+
+function refreshAgreementClientSelect() {
+    const sel = document.getElementById('ag-client-select');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">-- Manual / Direct Entry --</option>';
+    allClients.forEach(c => {
+        sel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+    });
+}
+
+window.agLoadClient = function (clientId) {
+    if (!clientId) return;
+    const c = allClients.find(x => x.id === clientId);
+    if (!c) return;
+
+       document.getElementById('ag-shop').value    = c.name || '';
+    // Fallback to shop name if owner name is empty
+    document.getElementById('ag-owner').value   = c.owner_name || c.name || '';
+    document.getElementById('ag-phone').value   = c.phone || '';
+    document.getElementById('ag-address').value = c.address || '';
+
+    const slug = (c.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+    if (slug) document.getElementById('ag-user-id').value = slug;
+
+    Object.keys(AG_SYNC).forEach(id =>
+        document.getElementById(id).dispatchEvent(new Event('input'))
+    );
+    document.getElementById('ag-date').dispatchEvent(new Event('input'));
+};
+
+window.pickClientForAgreement = function (clientId) {
+    window.location.hash = '#agreement';
+    setTimeout(() => {
+        document.getElementById('ag-client-select').value = clientId;
+        agLoadClient(clientId);
+        const saved = allAgreements.find(a => a.client_id === clientId);
+        if (saved) fillAgreementForm(saved);
+    }, 120);
+};
+
+function fillAgreementForm(a) {
+    if (!a) return;
+       document.getElementById('ag-shop').value       = a.shop_name || '';
+    // Fallback to shop name if owner name is empty
+    document.getElementById('ag-owner').value      = a.owner_name || a.shop_name || '';
+    document.getElementById('ag-phone').value      = a.phone || '';
+    document.getElementById('ag-address').value    = a.address || '';
+    document.getElementById('ag-user-id').value    = a.login_user_id || '';
+    document.getElementById('ag-password').value   = a.login_password || '';
+    document.getElementById('ag-login-url').value  = a.login_url || 'shopsteward.in/login';
+    document.getElementById('ag-date').value       = a.agreement_date || '';
+    document.getElementById('ag-tier').value       = a.tier || '';
+    document.getElementById('ag-setup-fee').value  = a.setup_fee || '';
+    document.getElementById('ag-annual-fee').value = a.annual_fee || '';
+
+    Object.keys(AG_SYNC).forEach(id =>
+        document.getElementById(id).dispatchEvent(new Event('input'))
+    );
+    document.getElementById('ag-date').dispatchEvent(new Event('input'));
+
+    if (a.client_signature_url) {
+        setAgreementClientSignature(a.client_signature_url, true);
+    }
+}
+
+window.resetAgreementForm = function () {
+    document.getElementById('ag-client-select').value = '';
+    document.getElementById('ag-shop').value = 'Ghosh Medical';
+    document.getElementById('ag-owner').value = 'Dibakar Ghosh';
+    document.getElementById('ag-phone').value = '+91 8145990555';
+    document.getElementById('ag-address').value = 'Paleswar Super Market, Nadia, 741101';
+    document.getElementById('ag-user-id').value = 'ghoshmedical';
+    document.getElementById('ag-password').value = 'GM@2026#secure';
+    document.getElementById('ag-login-url').value = 'shopsteward.in/login';
+    document.getElementById('ag-date').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('ag-tier').value = 'Base (Tier 1)';
+    document.getElementById('ag-setup-fee').value = '₹ 1,999';
+    document.getElementById('ag-annual-fee').value = '₹ 599 / year';
+
+    Object.keys(AG_SYNC).forEach(id =>
+        document.getElementById(id).dispatchEvent(new Event('input'))
+    );
+    document.getElementById('ag-date').dispatchEvent(new Event('input'));
+
+    document.getElementById('ag-client-sig-preview').innerHTML =
+        '<span style="font-size: 12px; color: var(--text-muted);">No signature uploaded</span>';
+    const slot = document.getElementById('clientSigSlot');
+    if (slot) slot.innerHTML = '<span class="sign-here-hint no-print">Upload signature or sign by hand</span>';
+};
+
+document.getElementById('ag-upload-client-sig')?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file || !currentUser) return;
+
+    const path = `${currentUser.id}/client_sig_${Date.now()}.png`;
+    const { error } = await sb.storage.from('branding').upload(path, file, { upsert: true });
+    if (error) return alert('Signature upload error: ' + error.message);
+
+    const { data: pub } = sb.storage.from('branding').getPublicUrl(path);
+    setAgreementClientSignature(pub.publicUrl, false);
+});
+
+function setAgreementClientSignature(url) {
+    const slot = document.getElementById('clientSigSlot');
+    if (slot) {
+        slot.innerHTML = `<img src="${url}" alt="Client Signature" class="founder-sig-img">`;
+    }
+    const prev = document.getElementById('ag-client-sig-preview');
+    if (prev) {
+        prev.innerHTML = `<img src="${url}" alt="Signature">`;
+    }
+}
+
+window.saveAgreementToSupabase = async function () {
+    if (!currentUser) return;
+
+    const shopName = document.getElementById('ag-shop').value.trim();
+    if (!shopName) return alert('Please enter the Shop Name.');
+
+    const btn = document.getElementById('btn-save-agreement');
+    btn.innerText = 'Saving...';
+    btn.disabled = true;
+
+    const sigImg = document.querySelector('#clientSigSlot img');
+    const clientSignatureUrl = sigImg ? sigImg.src : null;
+
+    const payload = {
+        user_id: currentUser.id,
+        client_id: document.getElementById('ag-client-select').value || null,
+        shop_name: shopName,
+        owner_name: document.getElementById('ag-owner').value.trim(),
+        phone: document.getElementById('ag-phone').value.trim(),
+        address: document.getElementById('ag-address').value.trim(),
+        login_user_id: document.getElementById('ag-user-id').value.trim(),
+        login_password: document.getElementById('ag-password').value.trim(),
+        login_url: document.getElementById('ag-login-url').value.trim(),
+        agreement_date: document.getElementById('ag-date').value || null,
+        tier: document.getElementById('ag-tier').value.trim(),
+        setup_fee: document.getElementById('ag-setup-fee').value.trim(),
+        annual_fee: document.getElementById('ag-annual-fee').value.trim(),
+        client_signature_url: clientSignatureUrl,
+        updated_at: new Date().toISOString(),
+    };
+
+    let error;
+    if (payload.client_id) {
+        ({ error } = await sb.from('agreements').upsert(payload, { onConflict: 'client_id' }));
+    } else {
+        ({ error } = await sb.from('agreements').insert([payload]));
+    }
+
+    btn.innerText = 'Save Agreement';
+    btn.disabled = false;
+
+    if (error) {
+        alert('Error saving agreement: ' + error.message);
+    } else {
+        alert('Agreement saved.');
+        await loadAgreements();
+    }
+};
+
+async function loadAgreements() {
+    if (!currentUser) return;
+    const { data } = await sb.from('agreements').select('*').order('updated_at', { ascending: false });
+    allAgreements = data || [];
+}
+
+window.printAgreement = function () {
+    document.body.classList.add('print-agreement');
+    window.print();
+};
+
+window.printInvoice = function () {
+    document.body.classList.add('print-invoice');
+    window.print();
+};
+
+window.addEventListener('afterprint', () => {
+    document.body.classList.remove('print-invoice', 'print-agreement');
+});
+
+   function slugifyShopName(name) {
+    return (name || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '')
+        .slice(0, 20) || 'user' + Math.floor(Math.random() * 9999);
+}
+
+function generateClientPassword(shopName) {
+    const initials = (shopName || 'XX')
+        .split(/\s+/)
+        .map(w => w[0])
+        .filter(Boolean)
+        .slice(0, 2)
+        .join('')
+        .toUpperCase() || 'XX';
+    const year = new Date().getFullYear();
+    const specials = ['@', '#', '$', '!'];
+    const sp1 = specials[Math.floor(Math.random() * specials.length)];
+    const sp2 = specials[Math.floor(Math.random() * specials.length)];
+    const suffix = Math.random().toString(36).slice(2, 6);
+    return `${initials}${sp1}${year}${sp2}${suffix}`;
+}
+
+function buildAgreementPayloadFromClient(client) {
+    const userId   = slugifyShopName(client.name);
+    const password = generateClientPassword(client.name);
+
+    return {
+        user_id:              currentUser.id,
+        client_id:            client.id,
+        shop_name:            client.name || '',
+        owner_name:           client.owner_name || '',
+        phone:                client.phone || '',
+        address:              client.address || '',
+        login_user_id:        userId,
+        login_password:       password,
+        login_url:            'shopsteward.in/login',
+        agreement_date:       new Date().toISOString().slice(0, 10),
+        tier:                 'Base (Tier 1)',
+        setup_fee:            '₹ 1,999',
+        annual_fee:           '₹ 599 / year',
+        client_signature_url: null,
+        updated_at:           new Date().toISOString()
+    };
+}
+
+async function autoCreateAgreementForClient(client) {
+    const payload = buildAgreementPayloadFromClient(client);
+    const { data, error } = await sb
+        .from('agreements')
+        .upsert(payload, { onConflict: 'client_id' })
+        .select()
+        .single();
+
+    if (error) throw new Error(error.message);
+    return data;
+}     
+
+(function initAgreementDefaults() {
+    const d = new Date();
+    document.getElementById('ag-date').value = d.toISOString().slice(0, 10);
+    resetAgreementForm();
+})();
 
         // Initialize application on page load
         resetInvoiceBuilder();
