@@ -868,7 +868,7 @@
            PRINT ENGINE OPTIMIZATION
            Hides UI, prints ONLY the razor-sharp A4 sheet
            ============================================================ */
-                @media print {
+                        @media print {
             @page {
                 size: A4 portrait;
                 margin: 0;
@@ -878,18 +878,17 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 height: auto !important;
-                overflow: hidden !important; /* Prevents extra scrollable pages */
+                overflow: hidden !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            body * {
-                visibility: hidden !important;
-            }
-            /* Hide all UI elements */
-            .studio-backdrop, .sidebar-dock, .top-navbar, .invoice-builder-form, .btn, #auth-modal {
+            
+            /* Hide standard UI entirely so it takes up ZERO space */
+            .studio-backdrop, .sidebar-dock, .top-navbar, #auth-modal, .invoice-builder-form {
                 display: none !important;
             }
-            /* Reset layout flow to remove grids and margins */
+
+            /* Flatten the app layout */
             .app-layout, .workspace, .view-pane, #view-create {
                 display: block !important;
                 position: static !important;
@@ -900,10 +899,13 @@
                 overflow: visible !important;
                 background: transparent !important;
             }
-            /* Un-grid the layout holding the form and invoice */
+
+            /* Break the CSS Grid so the invoice is the only thing left */
             #view-create > div[style*="grid-template-columns"] {
                 display: block !important;
+                margin: 0 !important;
             }
+
             .invoice-preview-wrapper {
                 display: block !important;
                 position: static !important;
@@ -911,16 +913,16 @@
                 padding: 0 !important;
                 width: 100% !important;
             }
-            /* The exact A4 constraints */
+
+            /* Strict 1-Page A4 Constraints */
             .a4-sheet {
                 visibility: visible !important;
                 display: flex !important;
                 flex-direction: column !important;
                 position: relative !important;
                 width: 210mm !important;
-                height: 296mm !important; /* 1mm less than 297mm to prevent a 2nd blank page */
-                min-height: 296mm !important;
-                max-height: 296mm !important;
+                height: 296.8mm !important; /* Slight buffer to prevent spillover */
+                max-height: 296.8mm !important;
                 margin: 0 auto !important;
                 padding: 0 !important;
                 box-shadow: none !important;
@@ -928,18 +930,16 @@
                 border-radius: 0 !important;
                 page-break-after: avoid !important;
                 page-break-inside: avoid !important;
-                overflow: hidden !important; /* Clips any overflowing text */
-                transform: scale(1) !important;
+                overflow: hidden !important; /* Clips any accidental overflow */
             }
+            
             .a4-sheet * {
                 visibility: visible !important;
             }
-            /* Ensure the table pushes the footer down evenly */
-            .a4-sheet > div[style*="flex: 1"] {
+
+            /* Force the table wrapper to take up available space */
+            .a4-sheet > div[style*="padding: 4mm"] {
                 flex: 1 1 auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                overflow: hidden !important;
             }
         }
     /* Inputs — must sit ABOVE the black or they vanish */
@@ -2258,7 +2258,7 @@
             });
 
             // Clean filler rows for neat A4 layout
-            const fillersNeeded = Math.max(0, 10 - invoiceLineItems.length);
+            const fillersNeeded = Math.max(0, 15 - invoiceLineItems.length);
             for (let i = 0; i < fillersNeeded; i++) {
                 tbody.innerHTML += `<tr class="empty-filler"><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>`;
             }
