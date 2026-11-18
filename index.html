@@ -936,8 +936,9 @@
             }
 
             /* 8. Format the A4 Pages */
-            body.print-agreement .page-a4,
-            body.print-invoice .a4-sheet {
+           body.print-agreement .page-a4,
+body.print-invoice .a4-sheet,
+body.print-free-invoice .a4-sheet {
                 display: flex !important;
                 flex-direction: column !important;
                 width: 210mm !important;
@@ -963,8 +964,9 @@
             }
 
             /* 9. Remove the page break from the LAST page so it doesn't print an extra blank page */
-            body.print-agreement .page-a4:last-child,
-            body.print-invoice .a4-sheet:last-child {
+           body.print-agreement .page-a4:last-child,
+body.print-invoice .a4-sheet:last-child,
+body.print-free-invoice .a4-sheet:last-child {
                 page-break-after: auto !important;
                 break-after: auto !important;
             }
@@ -973,6 +975,42 @@
             .page-footer {
                 display: none !important;
             }
+            /* ===== FREE INVOICE PRINT MODE ===== */
+body.print-free-invoice #view-free-invoice {
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+}
+
+#view-free-invoice > div:first-child {
+    display: none !important;
+}
+
+body.print-free-invoice #view-free-invoice > div[style*="grid-template-columns"] {
+    display: block !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    gap: 0 !important;
+    box-shadow: none !important;
+}
+
+body.print-free-invoice .free-invoice-form {
+    display: none !important;
+}
+
+body.print-free-invoice .a4-sheet {
+    padding: 0 !important;
+}
                         /* ==========================================
                FORCE STARK BLACK TEXT FOR TABLES & CLAUSES
                ========================================== */
@@ -1709,6 +1747,13 @@
             <a href="#create" class="dock-item" data-nav="create" data-tooltip="Generate Invoice">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             </a>
+            <a href="#free-invoice" class="dock-item" data-nav="free-invoice" data-tooltip="Free Invoice (No Terms)">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7 3h10a2 2 0 012 2v14l-3-2-3 2-3-2-3 2V5a2 2 0 012-2z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 8h6M9 12h6M9 16h3"/>
+    </svg>
+</a>
             <a href="#clients" class="dock-item" data-nav="clients" data-tooltip="Client Directory">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </a>
@@ -2156,7 +2201,277 @@
 
                 </div>
             </section>
+            
+<!-- ══════════════════════════════════════════════════════════
+     STEP 2 — Add this whole <section> as a sibling of the other
+     .view-pane sections (e.g. right after #view-create)
+     ══════════════════════════════════════════════════════════ -->
+<section id="view-free-invoice" class="view-pane">
 
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <div>
+            <h1>Free Invoice</h1>
+            <p style="color:var(--text-muted); font-size:13.5px; margin-top:4px;">
+                A clean, standalone invoice — no terms &amp; conditions, no ₹599 renewal tracking. Just bill and print.
+            </p>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-outline" onclick="resetFreeInvoiceBuilder()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Reset
+            </button>
+            <button class="btn btn-primary" onclick="printFreeInvoice()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                </svg>
+                Print A4 / Save PDF
+            </button>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1.08fr; gap:24px; align-items:start;">
+
+        <!-- ───────────── LEFT: FORM ───────────── -->
+        <div class="liquid-glass free-invoice-form" style="padding:24px; display:flex; flex-direction:column; gap:18px;">
+
+            <h3 style="font-size:15px;">Invoice Details</h3>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div class="form-group">
+                    <label class="form-label">Invoice Number</label>
+                    <input type="text" id="fi-inv-num" class="input-liquid mono" placeholder="INV-2026-001">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Invoice Date</label>
+                    <input type="date" id="fi-inv-date" class="input-liquid" onchange="renderFreeInvoicePreview()">
+                </div>
+            </div>
+
+            <!-- Client -->
+            <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:14px; display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label class="form-label">Bill To</label>
+                    <a href="#clients" style="font-size:11.5px; color:var(--primary-accent); text-decoration:none;">+ Manage Clients</a>
+                </div>
+
+                <select id="fi-client-select" class="input-liquid" onchange="fiPickClient(this.value)">
+                    <option value="">-- Custom / Direct Entry --</option>
+                </select>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group">
+                        <label class="form-label">Client Name</label>
+                        <input type="text" id="fi-client-name" class="input-liquid" placeholder="Rob &amp; Joe Traders" oninput="renderFreeInvoicePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" id="fi-client-phone" class="input-liquid" placeholder="+91 9876543210" oninput="renderFreeInvoicePreview()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Client Address</label>
+                    <textarea id="fi-client-address" class="input-liquid" rows="2" placeholder="34, Richie Street, Chennai, TN" oninput="renderFreeInvoicePreview()"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Client GSTIN (Optional)</label>
+                    <input type="text" id="fi-client-gstin" class="input-liquid mono" placeholder="33BBBBB1111B1Z2" oninput="renderFreeInvoicePreview()">
+                </div>
+            </div>
+
+            <!-- Tax -->
+            <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:14px; border-top:1px solid rgba(255,255,255,0.06); padding-top:14px;">
+                <div class="form-group">
+                    <label class="form-label">Place of Supply</label>
+                    <input type="text" id="fi-place-supply" class="input-liquid" value="West Bengal (19)" oninput="renderFreeInvoicePreview()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">GST Tax Mode</label>
+                    <select id="fi-tax-mode" class="input-liquid" onchange="renderFreeInvoicePreview()">
+                        <option value="cgst_sgst">Intra-State (CGST 9% + SGST 9%)</option>
+                        <option value="igst">Inter-State (IGST 18%)</option>
+                        <option value="none">Zero Tax / Exempt (0%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Items -->
+            <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h3 style="font-size:14px;">Line Items</h3>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="addFreeLineItem()">+ Add Item</button>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1.6fr 60px 50px 80px 30px; gap:8px; margin-bottom:6px; font-size:10.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); font-weight:600;">
+                    <span>Description</span><span>SAC</span><span>Qty</span><span>Rate</span><span></span>
+                </div>
+
+                <div id="fi-line-items" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+
+            <!-- Discount & payment -->
+            <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div class="form-group">
+                    <label class="form-label">Discount (₹)</label>
+                    <input type="number" id="fi-discount" class="input-liquid" value="0" min="0" oninput="renderFreeInvoicePreview()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Payment Mode</label>
+                    <select id="fi-pay-mode" class="input-liquid" onchange="renderFreeInvoicePreview()">
+                        <option value="UPI / Online Transfer">UPI / Online Transfer</option>
+                        <option value="Bank NEFT / RTGS">Bank NEFT / RTGS</option>
+                        <option value="Cash on Hand">Cash on Hand</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ───────────── RIGHT: A4 PREVIEW ───────────── -->
+        <div class="invoice-preview-wrapper" style="position:sticky; top:10px;">
+            <div class="a4-sheet" id="free-invoice-sheet">
+
+                <!-- Header -->
+                <div class="sheet-header">
+                    <div class="sheet-logo-group">
+                        <img id="fi-logo" class="sheet-logo" style="display:none;" src="" alt="Business Logo">
+                        <div class="sheet-biz-details">
+                            <h1 id="fi-biz-name">ShopSteward.in</h1>
+                            <p id="fi-biz-address">Kutki, Medinipur, West Bengal - 721451</p>
+                            <p id="fi-biz-contact">shopsteward.in@gmail.com / +91 86375 60557</p>
+                            <p id="fi-biz-gstin" style="font-weight:600; color:var(--inv-dark);">GSTIN: 19AAAAA0000A1Z5</p>
+                        </div>
+                    </div>
+
+                    <div class="sheet-title-badge">
+                        <h2>TAX INVOICE</h2>
+                        <p class="orig-text">ORIGINAL FOR RECIPIENT</p>
+                        <div style="margin-top:8px;">
+                            <span class="paid-stamp">PAID</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meta -->
+                <div class="sheet-meta-bar">
+                    <div class="meta-col">
+                        <p>Invoice No: <strong id="fi-inv-no">—</strong></p>
+                        <p>Invoice Date: <strong id="fi-inv-date">—</strong></p>
+                    </div>
+                    <div class="meta-col">
+                        <p>Payment Mode: <strong id="fi-pay-mode">UPI / Online</strong></p>
+                        <p>Place of Supply: <strong id="fi-place-supply">West Bengal (19)</strong></p>
+                    </div>
+                </div>
+
+                <!-- Parties -->
+                <div class="sheet-parties-bar">
+                    <div class="party-col">
+                        <h4>Billed To (Client):</h4>
+                        <p><strong id="fi-client-name">Client Name</strong></p>
+                        <p id="fi-client-address" class="party-muted">Client Address</p>
+                        <p id="fi-client-phone" class="party-muted"></p>
+                    </div>
+                    <div class="party-col">
+                        <h4>Shipped / Supplied To:</h4>
+                        <p>Same as Billing Address</p>
+                        <p class="party-muted">Digital Delivery / Hosted Cloud Service</p>
+                    </div>
+                </div>
+
+                <!-- Items -->
+                <div style="padding:4mm 12mm 0 12mm; flex:1;">
+                    <table class="sheet-items-table">
+                        <thead>
+                            <tr>
+                                <th width="5%" style="text-align:center;">#</th>
+                                <th width="45%">Description of Service / Solution</th>
+                                <th width="12%" style="text-align:center;">HSN/SAC</th>
+                                <th width="10%" style="text-align:center;">Qty</th>
+                                <th width="13%" style="text-align:right;">Rate (₹)</th>
+                                <th width="15%" style="text-align:right;">Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fi-items-tbody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Words -->
+                <div class="amount-in-words-row">
+                    <span style="font-weight:400; color:var(--inv-muted);">Amount in Words: </span>
+                    <span id="fi-words">Rupees Zero Only</span>
+                </div>
+
+                <!-- Bank + Totals -->
+                <div class="sheet-totals-split">
+                    <div class="bank-qr-box">
+                        <div class="qr-canvas-holder">
+                            <div id="fi-qr"></div>
+                        </div>
+                        <div class="bank-details-text">
+                            <p style="font-weight:700; color:var(--inv-dark); margin-bottom:2px;">Bank Transfer / Direct UPI</p>
+                            <p>Bank: <strong id="fi-bank-name">State Bank of India</strong></p>
+                            <p>A/C No: <strong id="fi-bank-acc">-</strong></p>
+                            <p>IFSC: <strong id="fi-bank-ifsc">-</strong></p>
+                            <p>UPI ID: <strong id="fi-upi-id">8637560557@upi</strong></p>
+                            <p style="font-size:8.5px; color:#059669; margin-top:3px;">✓ Verified for Instant Payment</p>
+                        </div>
+                    </div>
+
+                    <div class="calculations-box">
+                        <table class="calc-table">
+                            <tr>
+                                <td>Taxable Value</td>
+                                <td id="fi-calc-taxable">₹0.00</td>
+                            </tr>
+                            <tr id="fi-row-cgst">
+                                <td>CGST (9%)</td>
+                                <td id="fi-calc-cgst">₹0.00</td>
+                            </tr>
+                            <tr id="fi-row-sgst">
+                                <td>SGST (9%)</td>
+                                <td id="fi-calc-sgst">₹0.00</td>
+                            </tr>
+                            <tr id="fi-row-igst" style="display:none;">
+                                <td>IGST (18%)</td>
+                                <td id="fi-calc-igst">₹0.00</td>
+                            </tr>
+                            <tr>
+                                <td>Discount</td>
+                                <td id="fi-calc-discount" style="color:#dc2626;">-₹0.00</td>
+                            </tr>
+                            <tr class="total-highlight">
+                                <td>GRAND TOTAL</td>
+                                <td id="fi-calc-total">₹0.00</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Footer — NO TERMS, just a closing note + signature -->
+                <div class="sheet-footer" style="justify-content:space-between; align-items:flex-end;">
+                    <div style="font-size:10px; color:var(--inv-muted); line-height:1.5;">
+                        <p style="font-weight:700; color:var(--inv-dark); font-size:11px;">Thank you for your business!</p>
+                        <p>This is a computer-generated invoice.</p>
+                    </div>
+
+                    <div class="signatory-block">
+                        <img id="fi-signature" class="sig-img" style="display:none;" src="" alt="Digital Signature">
+                        <div class="sig-rule"></div>
+                        <p class="sig-label">Authorized Signatory</p>
+                        <p style="font-size:9px; color:var(--inv-muted);" id="fi-signatory-name">For ShopSteward.in</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
             <!-- ============================================================
                  VIEW 4: CLIENT DIRECTORY & ADDRESS BOOK
                  ============================================================ -->
@@ -4404,5 +4719,381 @@ async function autoCreateAgreementForClient(client) {
         resetInvoiceBuilder();
         initAuth();
     </script>
+    /* ══════════════════════════════════════════════════════════
+   STEP 4 — Add this script just before </body>
+   (self-contained, uses `fi-` prefixed names so nothing collides)
+   ══════════════════════════════════════════════════════════ */
+<script>
+/* ============================================================
+   FREE INVOICE MODULE
+   Standalone builder: no terms, no renewal/subscription logic.
+   ============================================================ */
+
+let freeInvoiceItems = [{ desc: '', hsn: '', qty: 1, rate: 0 }];
+let _fiLastQRAmount = null;
+let _fiInitialised   = false;
+
+/* ---------- helpers ---------- */
+function fiEsc(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function fiMoney(n) {
+    return '₹' + (Number(n) || 0).toLocaleString('en-IN', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+}
+function fiVal(id) {
+    const el = document.getElementById(id);
+    return el ? String(el.value || '').trim() : '';
+}
+function fiSet(id, txt) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+}
+function fiFmtDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+/* ---------- number → words (Indian system) ---------- */
+function fiTwoDigits(n) {
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+                  'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+                  'Seventeen', 'Eighteen', 'Nineteen'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    if (n < 20) return ones[n];
+    return tens[Math.floor(n / 10)] + (n % 10 ? ' ' + ones[n % 10] : '');
+}
+function fiNumberToWords(amount) {
+    let num = Math.round(Number(amount) || 0);
+    if (num === 0) return 'Rupees Zero Only';
+    const parts = [];
+    const crore    = Math.floor(num / 10000000); num %= 10000000;
+    const lakh     = Math.floor(num / 100000);   num %= 100000;
+    const thousand = Math.floor(num / 1000);     num %= 1000;
+    const hundred  = Math.floor(num / 100);      num %= 100;
+    if (crore)    parts.push(fiTwoDigits(crore) + ' Crore');
+    if (lakh)     parts.push(fiTwoDigits(lakh) + ' Lakh');
+    if (thousand) parts.push(fiTwoDigits(thousand) + ' Thousand');
+    if (hundred)  parts.push(fiTwoDigits(hundred) + ' Hundred');
+    if (num)      parts.push(fiTwoDigits(num));
+    return 'Rupees ' + parts.join(' ') + ' Only';
+}
+
+/* ---------- compute ---------- */
+function fiCompute() {
+    let taxable = 0;
+    freeInvoiceItems.forEach(function (it) {
+        taxable += (Number(it.qty) || 0) * (Number(it.rate) || 0);
+    });
+
+    const discount = Math.min(Number(fiVal('fi-discount')) || 0, taxable);
+    const base     = Math.max(taxable - discount, 0);
+    const mode     = fiVal('fi-tax-mode') || 'cgst_sgst';
+
+    let cgst = 0, sgst = 0, igst = 0;
+    if (mode === 'cgst_sgst') { cgst = base * 0.09; sgst = base * 0.09; }
+    else if (mode === 'igst') { igst = base * 0.18; }
+
+    const round = function (x) { return Math.round(x * 100) / 100; };
+
+    cgst = round(cgst); sgst = round(sgst); igst = round(igst);
+
+    return {
+        taxable:  round(taxable),
+        discount: round(discount),
+        cgst: cgst, sgst: sgst, igst: igst,
+        total: round(base + cgst + sgst + igst),
+        mode: mode
+    };
+}
+
+/* ---------- line items ---------- */
+function renderFreeLineItems() {
+    const wrap = document.getElementById('fi-line-items');
+    if (!wrap) return;
+
+    wrap.innerHTML = freeInvoiceItems.map(function (it, i) {
+        return '' +
+        '<div style="display:grid; grid-template-columns:1.6fr 60px 50px 80px 30px; gap:8px; align-items:center;">' +
+            '<input type="text" class="input-liquid" placeholder="Description of service" value="' + fiEsc(it.desc) + '" ' +
+                   'oninput="freeInvoiceItems[' + i + '].desc=this.value; renderFreeInvoicePreview();">' +
+            '<input type="text" class="input-liquid mono" placeholder="SAC" value="' + fiEsc(it.hsn) + '" ' +
+                   'oninput="freeInvoiceItems[' + i + '].hsn=this.value; renderFreeInvoicePreview();">' +
+            '<input type="number" class="input-liquid" min="0" step="1" value="' + it.qty + '" ' +
+                   'oninput="freeInvoiceItems[' + i + '].qty=parseFloat(this.value)||0; renderFreeInvoicePreview();">' +
+            '<input type="number" class="input-liquid" min="0" step="0.01" value="' + it.rate + '" ' +
+                   'oninput="freeInvoiceItems[' + i + '].rate=parseFloat(this.value)||0; renderFreeInvoicePreview();">' +
+            '<button type="button" class="btn btn-outline btn-sm" style="padding:6px 0; color:#f87171;" ' +
+                    'onclick="removeFreeLineItem(' + i + ')" title="Remove">&times;</button>' +
+        '</div>';
+    }).join('');
+}
+
+function addFreeLineItem() {
+    freeInvoiceItems.push({ desc: '', hsn: '', qty: 1, rate: 0 });
+    renderFreeLineItems();
+    renderFreeInvoicePreview();
+}
+
+function removeFreeLineItem(i) {
+    if (freeInvoiceItems.length <= 1) {
+        freeInvoiceItems = [{ desc: '', hsn: '', qty: 1, rate: 0 }];
+    } else {
+        freeInvoiceItems.splice(i, 1);
+    }
+    renderFreeLineItems();
+    renderFreeInvoicePreview();
+}
+
+/* ---------- UPI QR ---------- */
+function fiRenderQR(amount) {
+    const holder = document.getElementById('fi-qr');
+    if (!holder || typeof QRCode === 'undefined') return;
+
+    const amt = Math.round((Number(amount) || 0) * 100) / 100;
+    if (_fiLastQRAmount === amt) return;      // avoid flicker on every keystroke
+    _fiLastQRAmount = amt;
+
+    const upi  = (fiVal('prof-upi-id')  || '8637560557@upi').trim();
+    const name = (fiVal('prof-biz-name') || 'ShopSteward').trim();
+
+    const link = 'upi://pay?pa=' + encodeURIComponent(upi) +
+                 '&pn=' + encodeURIComponent(name) +
+                 '&am=' + amt.toFixed(2) + '&cu=INR';
+
+    holder.innerHTML = '';
+    new QRCode(holder, {
+        text: link, width: 77, height: 77,
+        correctLevel: QRCode.CorrectLevel.M
+    });
+
+    fiSet('fi-upi-id', upi);
+}
+
+/* ---------- main render ---------- */
+function renderFreeInvoicePreview() {
+    const sheet = document.getElementById('free-invoice-sheet');
+    if (!sheet) return;
+
+    const c = fiCompute();
+
+    /* -- Business identity: pulled live from Settings, with fallbacks -- */
+    const bizName    = fiVal('prof-biz-name') || 'ShopSteward.in';
+    const bizAddress = fiVal('prof-address')  || 'Kutki, Medinipur, West Bengal - 721451';
+    const bizContact = fiVal('prof-contact')  || 'shopsteward.in@gmail.com / +91 86375 60557';
+    const bizGstin   = fiVal('prof-gstin')    || '19AAAAA0000A1Z5';
+
+    fiSet('fi-biz-name',    bizName);
+    fiSet('fi-biz-address', bizAddress);
+    fiSet('fi-biz-contact', bizContact);
+    fiSet('fi-biz-gstin',   'GSTIN: ' + bizGstin);
+    fiSet('fi-signatory-name', 'For ' + bizName);
+
+    /* -- Logo & signature mirrored from Settings -- */
+    const logoSrc = document.getElementById('preview-logo-img');
+    const logoEl  = document.getElementById('fi-logo');
+    if (logoEl) {
+        if (logoSrc && logoSrc.getAttribute('src') && logoSrc.style.display !== 'none') {
+            logoEl.src = logoSrc.getAttribute('src');
+            logoEl.style.display = 'block';
+        } else {
+            logoEl.style.display = 'none';
+        }
+    }
+
+    const sigSrc = document.getElementById('preview-sig-img');
+    const sigEl  = document.getElementById('fi-signature');
+    if (sigEl) {
+        if (sigSrc && sigSrc.getAttribute('src') && sigSrc.style.display !== 'none') {
+            sigEl.src = sigSrc.getAttribute('src');
+            sigEl.style.display = 'block';
+        } else {
+            sigEl.style.display = 'none';
+        }
+    }
+
+    /* -- Meta -- */
+    fiSet('fi-inv-no',    fiVal('fi-inv-num') || '—');
+    fiSet('fi-inv-date',  fiFmtDate(fiVal('fi-inv-date')));
+    fiSet('fi-pay-mode',  fiVal('fi-pay-mode') || 'UPI / Online Transfer');
+    fiSet('fi-place-supply', fiVal('fi-place-supply') || 'West Bengal (19)');
+
+    /* -- Client -- */
+    fiSet('fi-client-name', fiVal('fi-client-name') || 'Client Name');
+
+    const addr = fiVal('fi-client-address');
+    const gst  = fiVal('fi-client-gstin');
+    fiSet('fi-client-address', addr || 'Client Address');
+    fiSet('fi-client-phone', [fiVal('fi-client-phone'), gst ? 'GSTIN: ' + gst : '']
+        .filter(Boolean).join('  •  '));
+
+    /* -- Bank -- */
+    fiSet('fi-bank-name', fiVal('prof-bank-name') || 'State Bank of India');
+    fiSet('fi-bank-acc',  fiVal('prof-bank-acc')  || '-');
+    fiSet('fi-bank-ifsc', fiVal('prof-bank-ifsc') || '-');
+
+    /* -- Items table -- */
+    const tbody = document.getElementById('fi-items-tbody');
+    if (tbody) {
+        tbody.innerHTML = freeInvoiceItems.map(function (it, i) {
+            const amt = (Number(it.qty) || 0) * (Number(it.rate) || 0);
+            return '<tr>' +
+                '<td style="text-align:center;">' + (i + 1) + '</td>' +
+                '<td>' + (fiEsc(it.desc) || '<span style="color:#94a3b8;">—</span>') + '</td>' +
+                '<td style="text-align:center;">' + (fiEsc(it.hsn) || '-') + '</td>' +
+                '<td style="text-align:center;">' + (it.qty || 0) + '</td>' +
+                '<td style="text-align:right;">' + fiMoney(it.rate) + '</td>' +
+                '<td style="text-align:right;">' + fiMoney(amt) + '</td>' +
+            '</tr>';
+        }).join('');
+    }
+
+    /* -- Totals -- */
+    fiSet('fi-calc-taxable',  fiMoney(c.taxable));
+    fiSet('fi-calc-cgst',     fiMoney(c.cgst));
+    fiSet('fi-calc-sgst',     fiMoney(c.sgst));
+    fiSet('fi-calc-igst',     fiMoney(c.igst));
+    fiSet('fi-calc-discount', '-' + fiMoney(c.discount));
+    fiSet('fi-calc-total',    fiMoney(c.total));
+
+    const rowCgst = document.getElementById('fi-row-cgst');
+    const rowSgst = document.getElementById('fi-row-sgst');
+    const rowIgst = document.getElementById('fi-row-igst');
+
+    if (rowCgst) rowCgst.style.display = (c.mode === 'cgst_sgst') ? '' : 'none';
+    if (rowSgst) rowSgst.style.display = (c.mode === 'cgst_sgst') ? '' : 'none';
+    if (rowIgst) rowIgst.style.display = (c.mode === 'igst')      ? '' : 'none';
+
+    /* -- Words -- */
+    fiSet('fi-words', fiNumberToWords(c.total));
+
+    /* -- QR -- */
+    fiRenderQR(c.total);
+}
+
+/* ---------- init / reset ---------- */
+function fiTodayISO() {
+    return new Date().toISOString().slice(0, 10);
+}
+
+function fiDefaultInvoiceNo() {
+    const y = new Date().getFullYear();
+    const n = String((freeInvoiceItems.length ? 1 : 1)).padStart(3, '0');
+    return 'INV-' + y + '-' + n;
+}
+
+function resetFreeInvoiceBuilder() {
+    freeInvoiceItems = [{ desc: '', hsn: '', qty: 1, rate: 0 }];
+
+    ['fi-client-name', 'fi-client-phone', 'fi-client-address', 'fi-client-gstin']
+        .forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
+
+    const num  = document.getElementById('fi-inv-num');  if (num)  num.value  = fiDefaultInvoiceNo();
+    const date = document.getElementById('fi-inv-date'); if (date) date.value = fiTodayISO();
+    const disc = document.getElementById('fi-discount'); if (disc) disc.value = 0;
+
+    _fiLastQRAmount = null;
+
+    renderFreeLineItems();
+    renderFreeInvoicePreview();
+}
+
+function fiInit() {
+    const dateEl = document.getElementById('fi-inv-date');
+    if (dateEl && !dateEl.value) dateEl.value = fiTodayISO();
+
+    const numEl = document.getElementById('fi-inv-num');
+    if (numEl && !numEl.value) numEl.value = fiDefaultInvoiceNo();
+
+    if (!_fiInitialised) {
+        _fiInitialised = true;
+        renderFreeLineItems();
+    }
+    renderFreeInvoicePreview();
+}
+
+/* ---------- print ---------- */
+function printFreeInvoice() {
+    renderFreeInvoicePreview();
+
+    document.body.classList.add('print-free-invoice');
+
+    const cleanup = function () {
+        document.body.classList.remove('print-free-invoice');
+        window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+
+    setTimeout(function () { window.print(); }, 80);
+    setTimeout(cleanup, 60000); // safety net
+}
+
+/* ---------- optional: pull clients into the dropdown ---------- */
+function fiPickClient(clientId) {
+    if (!clientId) return;
+
+    // Works if your app exposes a `clients` array; otherwise ignore.
+    const list = (typeof window.clients !== 'undefined' && Array.isArray(window.clients)) ? window.clients : [];
+    const c = list.find(function (x) {
+        return String(x.id) === String(clientId) || x.name === clientId;
+    });
+    if (!c) return;
+
+    const set = function (id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    set('fi-client-name',    c.name || c.client_name || '');
+    set('fi-client-phone',   c.phone || '');
+    set('fi-client-address', c.address || '');
+    set('fi-client-gstin',   c.gstin || '');
+
+    renderFreeInvoicePreview();
+}
+
+/* ---------- wire up ---------- */
+document.addEventListener('click', function (e) {
+    const link = e.target.closest('[data-nav="free-invoice"]');
+    if (link) setTimeout(fiInit, 60);
+});
+
+window.addEventListener('hashchange', function () {
+    if (location.hash === '#free-invoice') setTimeout(fiInit, 60);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (location.hash === '#free-invoice') setTimeout(fiInit, 120);
+});
+    /* Ensure the free-invoice view opens and initialises */
+function fiShowView() {
+    document.querySelectorAll('.view-pane').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-free-invoice')?.classList.add('active');
+
+    document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
+    document.querySelector('[data-nav="free-invoice"]')?.classList.add('active');
+
+    fiInit();
+}
+
+document.addEventListener('click', function (e) {
+    const link = e.target.closest('[data-nav="free-invoice"]');
+    if (!link) return;
+    e.preventDefault();
+    if (location.hash !== '#free-invoice') {
+        location.hash = '#free-invoice';
+    }
+    fiShowView();
+});
+
+window.addEventListener('hashchange', function () {
+    if (location.hash === '#free-invoice') fiShowView();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (location.hash === '#free-invoice') setTimeout(fiShowView, 100);
+});
+</script>
 </body>
 </html>
