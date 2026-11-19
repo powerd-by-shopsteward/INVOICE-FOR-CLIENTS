@@ -4037,6 +4037,12 @@ async function saveInvoiceToSupabase() {
         ? (parseFloat(document.getElementById('form-renewal-amount').value) || 0)
         : null;
 
+      // ⚡ Calculate the custom renewal amount first
+    const isTrackingRenewal = document.getElementById('form-track-renewal').checked;
+    const customRenewalAmount = isTrackingRenewal 
+        ? (parseFloat(document.getElementById('form-renewal-amount').value) || 0)
+        : null;
+
     const invoicePayload = {
         user_id: currentUser.id,
         invoice_number: document.getElementById('form-inv-num').value,
@@ -4060,8 +4066,11 @@ async function saveInvoiceToSupabase() {
         subscription_renewal_date: isTrackingRenewal 
             ? document.getElementById('form-renewal-date').value 
             : null,
-        // ⚡ NEW: Save the custom amount
-        renewal_amount: customRenewalAmount 
+            
+        // ⚡ BYPASS: Save it inside the existing 'metadata' JSON column instead!
+        metadata: {
+            renewal_amount: customRenewalAmount
+        }
     };
 
     const { error } = await sb.from('invoices').insert([invoicePayload]);
@@ -4260,13 +4269,15 @@ For any support or renewal inquiries, reach out to us at shopsteward.in@gmail.co
     if (renewalInvoices.length === 0) {
         renewalsFeed.innerHTML = `<span style="font-size:12px; color:var(--text-faint);">No upcoming renewals logged yet.</span>`;
     } else {
-        renewalInvoices.slice(0, 5).forEach(inv => {
+               renewalInvoices.slice(0, 5).forEach(inv => {
             const rDate = new Date(inv.subscription_renewal_date);
             
-            // ⚡ NEW: Use custom amount, or fallback to 599 for older invoices
-            const amt = inv.renewal_amount !== null && inv.renewal_amount !== undefined 
-                ? Number(inv.renewal_amount) 
-                : 599;
+            // ⚡ Read from metadata, fallback to 599 if it's an older invoice
+            let amt = 599; 
+            if (inv.metadata && inv.metadata.renewal_amount !== undefined && inv.metadata.renewal_amount !== null) {
+                amt = Number(inv.metadata.renewal_amount);
+            }
+            
             const displayAmt = amt > 0 ? `₹${amt.toLocaleString('en-IN')} / Yr` : 'Custom';
 
             renewalsFeed.innerHTML += `
