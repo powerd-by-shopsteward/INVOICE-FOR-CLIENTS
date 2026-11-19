@@ -4008,23 +4008,22 @@ body.print-free-invoice .a4-sheet {
             return result + " Only";
         }
 
-    // ⚡ DYNAMIC TERMS & CONDITIONS UPDATE
-    const isTracking = document.getElementById('form-track-renewal').checked;
-    const renewalAmt = parseFloat(document.getElementById('form-renewal-amount').value) || 0;
-    const termsEl = document.getElementById('a4-terms-text');
+                // ⚡ STATIC TERMS & CONDITIONS UPDATE
+            const isTracking = document.getElementById('form-track-renewal').checked;
+            const termsEl = document.getElementById('a4-terms-text');
 
-    if (termsEl) {
-        if (isTracking && renewalAmt > 0) {
-            // Show the custom amount
-            termsEl.innerHTML = `1. This service includes first-year setup & cloud hosting.<br>
-                                 2. An annual renewal fee of ₹${renewalAmt.toLocaleString('en-IN')} is payable from year 2 onwards.<br>
-                                 3. This invoice is fully paid and acknowledged upon generation.`;
-        } else {
-            // If tracking is turned off, remove the renewal clause entirely
-            termsEl.innerHTML = `1. This service includes first-year setup & cloud hosting.<br>
-                                 2. This invoice is fully paid and acknowledged upon generation.`;
-        }
-    }
+            if (termsEl) {
+                if (isTracking) {
+                    // Show the static renewal clause (no amount specified)
+                    termsEl.innerHTML = `1. This service includes first-year setup & cloud hosting.<br>
+                                         2. An annual renewal fee is payable from year 2 onwards as per the signed service agreement.<br>
+                                         3. This invoice is fully paid and acknowledged upon generation.`;
+                } else {
+                    // If tracking is turned off, remove the renewal clause entirely
+                    termsEl.innerHTML = `1. This service includes first-year setup & cloud hosting.<br>
+                                         2. This invoice is fully paid and acknowledged upon generation.`;
+                }
+            }
                
               // Save Invoice to Supabase
         async function saveInvoiceToSupabase() {
