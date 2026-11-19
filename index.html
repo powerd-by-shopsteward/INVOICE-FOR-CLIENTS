@@ -1834,13 +1834,14 @@ body.print-free-invoice .a4-sheet {
                     </div>
 
                     <div class="liquid-glass metric-card liquid-glass-interactive">
-                        <div class="card-head">
-                            <span class="label">Annual Renewals</span>
-                            <span class="badge badge-primary">₹599 / Yr Base</span>
-                        </div>
-                        <div class="num" id="kpi-subscriptions" style="color: var(--warning);">₹0.00</div>
-                        <div class="subtext" id="kpi-subs-due">0 Subscriptions Active</div>
-                    </div>
+    <div class="card-head">
+        <span class="label">Annual Renewals</span>
+        <!-- Changed Badge text -->
+        <span class="badge badge-primary">Custom Rates</span>
+    </div>
+    <div class="num" id="kpi-subscriptions" style="color: var(--warning);">₹0.00</div>
+    <div class="subtext" id="kpi-subs-due">0 Subscriptions Active</div>
+</div>
 
                     <div class="liquid-glass metric-card liquid-glass-interactive">
                         <div class="card-head">
@@ -1869,16 +1870,17 @@ body.print-free-invoice .a4-sheet {
                     </div>
 
                     <!-- Upcoming ₹599 Subscription Renewals -->
-                    <div class="liquid-glass col-span-1" style="padding: 20px; border-radius: var(--radius-lg); display: flex; flex-direction: column;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                            <h3 style="font-size: 14px;">Renewals Due</h3>
-                            <span class="badge badge-warning">Upcoming</span>
-                        </div>
-                        <p style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px;">Clients due for their ₹599 annual hosting fee:</p>
-                        <div id="renewals-feed" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; max-height: 230px;">
-                            <!-- Injected dynamically -->
-                        </div>
-                    </div>
+                   <div class="liquid-glass col-span-1" style="padding: 20px; border-radius: var(--radius-lg); display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <h3 style="font-size: 14px;">Renewals Due</h3>
+        <span class="badge badge-warning">Upcoming</span>
+    </div>
+    <!-- Changed Paragraph text -->
+    <p style="font-size: 11.5px; color: var(--text-muted); margin-bottom: 12px;">Clients due for their annual renewal fee:</p>
+    <div id="renewals-feed" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; max-height: 230px;">
+        <!-- Injected dynamically -->
+    </div>
+</div>
                 </div>
             </section>
 
@@ -2039,20 +2041,27 @@ body.print-free-invoice .a4-sheet {
                             </div>
                         </div>
 
-                        <!-- Annual ₹599 Subscription Tracking toggle -->
-                        <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 14px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                <label style="font-size: 13px; font-weight: 600; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                                    <input type="checkbox" id="form-track-renewal" checked style="width: 16px; height: 16px;">
-                                    Track Annual ₹599 Renewal
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" style="color: #d97706;">Next Renewal Date (1 Year From Today)</label>
-                                <input type="date" id="form-renewal-date" class="input-liquid">
-                            </div>
-                        </div>
-                    </div>
+                        <!-- Annual Custom Renewal Tracking toggle -->
+<div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 14px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <label style="font-size: 13px; font-weight: 600; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="form-track-renewal" checked style="width: 16px; height: 16px;">
+            Track Annual Renewal
+        </label>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div class="form-group">
+            <label class="form-label" style="color: #d97706;">Renewal Amount (₹)</label>
+            <!-- NEW: Free text box for custom amount -->
+            <input type="number" id="form-renewal-amount" class="input-liquid" value="599" min="0" placeholder="e.g. 599">
+        </div>
+        <div class="form-group">
+            <label class="form-label" style="color: #d97706;">Next Renewal Date</label>
+            <input type="date" id="form-renewal-date" class="input-liquid">
+        </div>
+    </div>
+</div>
 
                     <!-- Right Column: REAL-TIME A4 INVOICE SHEET PREVIEW -->
                     <div class="invoice-preview-wrapper" style="position: sticky; top: 10px;">
@@ -3990,66 +3999,74 @@ body.print-free-invoice .a4-sheet {
             return result + " Only";
         }
 
-        // Save Invoice to Supabase
-        async function saveInvoiceToSupabase() {
-            if (!currentUser) return;
-            const clientName = document.getElementById('form-client-name').value.trim();
-            if (!clientName) return alert("Please specify the Client Name.");
+       // Save Invoice to Supabase
+async function saveInvoiceToSupabase() {
+    if (!currentUser) return;
+    const clientName = document.getElementById('form-client-name').value.trim();
+    if (!clientName) return alert("Please specify the Client Name.");
 
-            const btn = document.getElementById('btn-save-inv');
-            btn.innerText = "Saving Invoice...";
-            btn.disabled = true;
+    const btn = document.getElementById('btn-save-inv');
+    btn.innerText = "Saving Invoice...";
+    btn.disabled = true;
 
-            const taxableSubtotal = invoiceLineItems.reduce((acc, i) => acc + ((i.qty || 1) * (i.rate || 0)), 0);
-            const taxMode = document.getElementById('form-tax-mode').value;
-            const discount = parseFloat(document.getElementById('form-discount').value) || 0;
+    const taxableSubtotal = invoiceLineItems.reduce((acc, i) => acc + ((i.qty || 1) * (i.rate || 0)), 0);
+    const taxMode = document.getElementById('form-tax-mode').value;
+    const discount = parseFloat(document.getElementById('form-discount').value) || 0;
 
-            let cgst = 0, sgst = 0, igst = 0;
-            if (taxMode === 'cgst_sgst') {
-                cgst = taxableSubtotal * 0.09;
-                sgst = taxableSubtotal * 0.09;
-            } else if (taxMode === 'igst') {
-                igst = taxableSubtotal * 0.18;
-            }
-            const grandTotal = Math.max(0, taxableSubtotal + cgst + sgst + igst - discount);
+    let cgst = 0, sgst = 0, igst = 0;
+    if (taxMode === 'cgst_sgst') {
+        cgst = taxableSubtotal * 0.09;
+        sgst = taxableSubtotal * 0.09;
+    } else if (taxMode === 'igst') {
+        igst = taxableSubtotal * 0.18;
+    }
+    const grandTotal = Math.max(0, taxableSubtotal + cgst + sgst + igst - discount);
 
-            const invoicePayload = {
-                user_id: currentUser.id,
-                invoice_number: document.getElementById('form-inv-num').value,
-                date: document.getElementById('form-inv-date').value,
-                client_name: clientName,
-                client_phone: document.getElementById('form-client-phone').value,
-                client_address: document.getElementById('form-client-address').value,
-                place_of_supply: document.getElementById('form-place-supply').value,
-                tax_type: taxMode,
-                items: invoiceLineItems,
-                subtotal: taxableSubtotal,
-                tax_rate: taxMode === 'none' ? 0 : 18,
-                cgst_amount: cgst,
-                sgst_amount: sgst,
-                igst_amount: igst,
-                tax_amount: (cgst + sgst + igst),
-                discount: discount,
-                total: grandTotal,
-                payment_mode: document.getElementById('form-payment-mode').value,
-                payment_status: 'Paid',
-                subscription_renewal_date: document.getElementById('form-track-renewal').checked 
-                    ? document.getElementById('form-renewal-date').value 
-                    : null
-            };
+    // ⚡ NEW: Grab the custom renewal amount
+    const isTrackingRenewal = document.getElementById('form-track-renewal').checked;
+    const customRenewalAmount = isTrackingRenewal 
+        ? (parseFloat(document.getElementById('form-renewal-amount').value) || 0)
+        : null;
 
-            const { error } = await sb.from('invoices').insert([invoicePayload]);
-            btn.innerText = "Save Invoice";
-            btn.disabled = false;
+    const invoicePayload = {
+        user_id: currentUser.id,
+        invoice_number: document.getElementById('form-inv-num').value,
+        date: document.getElementById('form-inv-date').value,
+        client_name: clientName,
+        client_phone: document.getElementById('form-client-phone').value,
+        client_address: document.getElementById('form-client-address').value,
+        place_of_supply: document.getElementById('form-place-supply').value,
+        tax_type: taxMode,
+        items: invoiceLineItems,
+        subtotal: taxableSubtotal,
+        tax_rate: taxMode === 'none' ? 0 : 18,
+        cgst_amount: cgst,
+        sgst_amount: sgst,
+        igst_amount: igst,
+        tax_amount: (cgst + sgst + igst),
+        discount: discount,
+        total: grandTotal,
+        payment_mode: document.getElementById('form-payment-mode').value,
+        payment_status: 'Paid',
+        subscription_renewal_date: isTrackingRenewal 
+            ? document.getElementById('form-renewal-date').value 
+            : null,
+        // ⚡ NEW: Save the custom amount
+        renewal_amount: customRenewalAmount 
+    };
 
-            if (error) {
-                alert("Error saving invoice: " + error.message);
-            } else {
-                alert("Invoice saved successfully!");
-                window.location.hash = '#invoices';
-                loadAllData();
-            }
-        }
+    const { error } = await sb.from('invoices').insert([invoicePayload]);
+    btn.innerText = "Save Invoice";
+    btn.disabled = false;
+
+    if (error) {
+        alert("Error saving invoice: " + error.message);
+    } else {
+        alert("Invoice saved successfully!");
+        window.location.hash = '#invoices';
+        loadAllData();
+    }
+}
 
         // ============================================================
         // 6. HISTORICAL INVOICES, PRINT & WHATSAPP SHARING
@@ -4201,53 +4218,60 @@ For any support or renewal inquiries, reach out to us at shopsteward.in@gmail.co
             renderAnalyticsChart();
         }
 
-        function updateDashboardKPIs() {
-            const totalRev = allInvoices.reduce((acc, i) => acc + Number(i.total || 0), 0);
+       function updateDashboardKPIs() {
+    const totalRev = allInvoices.reduce((acc, i) => acc + Number(i.total || 0), 0);
+    
+    let totalExp = 0;
+    let totalSubsOut = 0;
+    allExpenses.forEach(e => {
+        if (e.type === 'subscription') totalSubsOut += Number(e.amount || 0);
+        else totalExp += Number(e.amount || 0);
+    });
+
+    const totalOutflow = totalExp + totalSubsOut;
+    const netCash = totalRev - totalOutflow;
+
+    document.getElementById('kpi-revenue').innerText = `₹${totalRev.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    document.getElementById('kpi-invoice-count').innerText = `${allInvoices.length} Invoices Issued`;
+
+    document.getElementById('kpi-expenses').innerText = `₹${totalOutflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    document.getElementById('kpi-subscriptions').innerText = `₹${totalSubsOut.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+    const netEl = document.getElementById('kpi-net');
+    netEl.innerText = `₹${netCash.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    netEl.style.color = netCash >= 0 ? '#10b981' : '#ef4444';
+
+    // Renewals due feed (clients with renewal dates)
+    const renewalsFeed = document.getElementById('renewals-feed');
+    renewalsFeed.innerHTML = '';
+    
+    const renewalInvoices = allInvoices.filter(i => i.subscription_renewal_date);
+    document.getElementById('kpi-subs-due').innerText = `${renewalInvoices.length} Subscriptions Active`;
+
+    if (renewalInvoices.length === 0) {
+        renewalsFeed.innerHTML = `<span style="font-size:12px; color:var(--text-faint);">No upcoming renewals logged yet.</span>`;
+    } else {
+        renewalInvoices.slice(0, 5).forEach(inv => {
+            const rDate = new Date(inv.subscription_renewal_date);
             
-            let totalExp = 0;
-            let totalSubsOut = 0;
-            allExpenses.forEach(e => {
-                if (e.type === 'subscription') totalSubsOut += Number(e.amount || 0);
-                else totalExp += Number(e.amount || 0);
-            });
+            // ⚡ NEW: Use custom amount, or fallback to 599 for older invoices
+            const amt = inv.renewal_amount !== null && inv.renewal_amount !== undefined 
+                ? Number(inv.renewal_amount) 
+                : 599;
+            const displayAmt = amt > 0 ? `₹${amt.toLocaleString('en-IN')} / Yr` : 'Custom';
 
-            const totalOutflow = totalExp + totalSubsOut;
-            const netCash = totalRev - totalOutflow;
-
-            document.getElementById('kpi-revenue').innerText = `₹${totalRev.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-            document.getElementById('kpi-invoice-count').innerText = `${allInvoices.length} Invoices Issued`;
-
-            document.getElementById('kpi-expenses').innerText = `₹${totalOutflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-            document.getElementById('kpi-subscriptions').innerText = `₹${totalSubsOut.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-
-            const netEl = document.getElementById('kpi-net');
-            netEl.innerText = `₹${netCash.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-            netEl.style.color = netCash >= 0 ? '#10b981' : '#ef4444';
-
-            // Renewals due feed (clients with renewal dates)
-            const renewalsFeed = document.getElementById('renewals-feed');
-            renewalsFeed.innerHTML = '';
-            
-            const renewalInvoices = allInvoices.filter(i => i.subscription_renewal_date);
-            document.getElementById('kpi-subs-due').innerText = `${renewalInvoices.length} Subscriptions Active`;
-
-            if (renewalInvoices.length === 0) {
-                renewalsFeed.innerHTML = `<span style="font-size:12px; color:var(--text-faint);">No upcoming renewals logged yet.</span>`;
-            } else {
-                renewalInvoices.slice(0, 5).forEach(inv => {
-                    const rDate = new Date(inv.subscription_renewal_date);
-                    renewalsFeed.innerHTML += `
-                        <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <strong style="font-size: 12px; color: var(--text-title);">${inv.client_name}</strong>
-                                <div style="font-size: 10px; color: var(--text-muted);">${rDate.toLocaleDateString('en-GB')}</div>
-                            </div>
-                            <span class="badge badge-warning">₹599 / Yr</span>
-                        </div>
-                    `;
-                });
-            }
-        }
+            renewalsFeed.innerHTML += `
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="font-size: 12px; color: var(--text-title);">${inv.client_name}</strong>
+                        <div style="font-size: 10px; color: var(--text-muted);">${rDate.toLocaleDateString('en-GB')}</div>
+                    </div>
+                    <span class="badge badge-warning">${displayAmt}</span>
+                </div>
+            `;
+        });
+    }
+}
 
         function renderInvoiceRows(invoices) {
             const tbody = document.getElementById('invoices-tbody');
