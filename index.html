@@ -1934,7 +1934,7 @@ body.print-free-invoice .a4-sheet {
                 </div>
             </section>
 
-            <!-- ============================================================
+                       <!-- ============================================================
                  VIEW 3: CREATE & EDIT INVOICE (Form + Live A4 Preview)
                  ============================================================ -->
             <section id="view-create" class="view-pane">
@@ -1957,10 +1957,11 @@ body.print-free-invoice .a4-sheet {
                     </div>
                 </div>
 
-               <div style="display: grid; grid-template-columns: 1fr 1.08fr; gap: 24px; align-items: start; width: 100%;">
+                <!-- ⚡ THE LAYOUT FIX IS HERE ⚡ -->
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px; align-items: start; width: 100%;">
                     
                     <!-- Left Column: Invoice Form Controls -->
-                    <div class="liquid-glass invoice-builder-form" style="padding: 24px; display: flex; flex-direction: column; gap: 18px; min-width: 0;">
+                    <div class="liquid-glass invoice-builder-form" style="padding: 24px; display: flex; flex-direction: column; gap: 18px; min-width: 0; width: 100%;">
                         
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <h3 style="font-size: 15px;">Invoice Metadata</h3>
@@ -2049,31 +2050,31 @@ body.print-free-invoice .a4-sheet {
                             </div>
                         </div>
 
-                        <!-- Annual Custom Renewal Tracking toggle -->
-<div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 14px;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-        <label style="font-size: 13px; font-weight: 600; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="form-track-renewal" checked style="width: 16px; height: 16px;">
-            Track Annual Renewal
-        </label>
-    </div>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-        <div class="form-group">
-            <label class="form-label" style="color: #d97706;">Renewal Amount (₹)</label>
-            <!-- NEW: Free text box for custom amount -->
-            <input type="number" id="form-renewal-amount" class="input-liquid" value="599" min="0" placeholder="e.g. 599">
-        </div>
-        <div class="form-group">
-            <label class="form-label" style="color: #d97706;">Next Renewal Date</label>
-            <input type="date" id="form-renewal-date" class="input-liquid">
-        </div>
-    </div>
-</div>
+                        <!-- Annual Renewal Tracking toggle -->
+                        <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 14px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                <label style="font-size: 13px; font-weight: 600; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" id="form-track-renewal" checked style="width: 16px; height: 16px;">
+                                    Track Annual Renewal
+                                </label>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                                <div class="form-group">
+                                    <label class="form-label" style="color: #d97706;">Renewal Amount (₹)</label>
+                                    <input type="number" id="form-renewal-amount" class="input-liquid" value="599" min="0" placeholder="e.g. 599">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" style="color: #d97706;">Next Renewal Date</label>
+                                    <input type="date" id="form-renewal-date" class="input-liquid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Right Column: REAL-TIME A4 INVOICE SHEET PREVIEW -->
-                   <div class="invoice-preview-wrapper" style="position: sticky; top: 10px; min-width: 0; width: 100%;">
-        <div class="a4-sheet" id="invoice-sheet">
+                    <div class="invoice-preview-wrapper" style="position: sticky; top: 10px; min-width: 0; width: 100%; display: flex; justify-content: flex-start; overflow-x: auto;">
+                        <div class="a4-sheet" id="invoice-sheet">
                             
                             <!-- Sheet Header -->
                             <div class="sheet-header">
