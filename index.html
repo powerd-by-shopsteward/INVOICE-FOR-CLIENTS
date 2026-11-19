@@ -4008,83 +4008,77 @@ body.print-free-invoice .a4-sheet {
             return result + " Only";
         }
 
-       // Save Invoice to Supabase
-async function saveInvoiceToSupabase() {
-    if (!currentUser) return;
-    const clientName = document.getElementById('form-client-name').value.trim();
-    if (!clientName) return alert("Please specify the Client Name.");
+              // Save Invoice to Supabase
+        async function saveInvoiceToSupabase() {
+            if (!currentUser) return;
+            const clientName = document.getElementById('form-client-name').value.trim();
+            if (!clientName) return alert("Please specify the Client Name.");
 
-    const btn = document.getElementById('btn-save-inv');
-    btn.innerText = "Saving Invoice...";
-    btn.disabled = true;
+            const btn = document.getElementById('btn-save-inv');
+            btn.innerText = "Saving Invoice...";
+            btn.disabled = true;
 
-    const taxableSubtotal = invoiceLineItems.reduce((acc, i) => acc + ((i.qty || 1) * (i.rate || 0)), 0);
-    const taxMode = document.getElementById('form-tax-mode').value;
-    const discount = parseFloat(document.getElementById('form-discount').value) || 0;
+            const taxableSubtotal = invoiceLineItems.reduce((acc, i) => acc + ((i.qty || 1) * (i.rate || 0)), 0);
+            const taxMode = document.getElementById('form-tax-mode').value;
+            const discount = parseFloat(document.getElementById('form-discount').value) || 0;
 
-    let cgst = 0, sgst = 0, igst = 0;
-    if (taxMode === 'cgst_sgst') {
-        cgst = taxableSubtotal * 0.09;
-        sgst = taxableSubtotal * 0.09;
-    } else if (taxMode === 'igst') {
-        igst = taxableSubtotal * 0.18;
-    }
-    const grandTotal = Math.max(0, taxableSubtotal + cgst + sgst + igst - discount);
+            let cgst = 0, sgst = 0, igst = 0;
+            if (taxMode === 'cgst_sgst') {
+                cgst = taxableSubtotal * 0.09;
+                sgst = taxableSubtotal * 0.09;
+            } else if (taxMode === 'igst') {
+                igst = taxableSubtotal * 0.18;
+            }
+            const grandTotal = Math.max(0, taxableSubtotal + cgst + sgst + igst - discount);
 
-    // ⚡ NEW: Grab the custom renewal amount
-    const isTrackingRenewal = document.getElementById('form-track-renewal').checked;
-    const customRenewalAmount = isTrackingRenewal 
-        ? (parseFloat(document.getElementById('form-renewal-amount').value) || 0)
-        : null;
+            // ⚡ Calculate the custom renewal amount ONCE
+            const isTrackingRenewal = document.getElementById('form-track-renewal').checked;
+            const customRenewalAmount = isTrackingRenewal 
+                ? (parseFloat(document.getElementById('form-renewal-amount').value) || 0)
+                : null;
 
-      // ⚡ Calculate the custom renewal amount first
-    const isTrackingRenewal = document.getElementById('form-track-renewal').checked;
-    const customRenewalAmount = isTrackingRenewal 
-        ? (parseFloat(document.getElementById('form-renewal-amount').value) || 0)
-        : null;
+            const invoicePayload = {
+                user_id: currentUser.id,
+                invoice_number: document.getElementById('form-inv-num').value,
+                date: document.getElementById('form-inv-date').value,
+                client_name: clientName,
+                client_phone: document.getElementById('form-client-phone').value,
+                client_address: document.getElementById('form-client-address').value,
+                place_of_supply: document.getElementById('form-place-supply').value,
+                tax_type: taxMode,
+                items: invoiceLineItems,
+                subtotal: taxableSubtotal,
+                tax_rate: taxMode === 'none' ? 0 : 18,
+                cgst_amount: cgst,
+                sgst_amount: sgst,
+                igst_amount: igst,
+                tax_amount: (cgst + sgst + igst),
+                discount: discount,
+                total: grandTotal,
+                payment_mode: document.getElementById('form-payment-mode').value,
+                payment_status: 'Paid',
+                subscription_renewal_date: isTrackingRenewal 
+                    ? document.getElementById('form-renewal-date').value 
+                    : null,
+                    
+                // ⚡ BYPASS: Save it inside the existing 'metadata' JSON column
+                metadata: {
+                    renewal_amount: customRenewalAmount
+                }
+            };
 
-    const invoicePayload = {
-        user_id: currentUser.id,
-        invoice_number: document.getElementById('form-inv-num').value,
-        date: document.getElementById('form-inv-date').value,
-        client_name: clientName,
-        client_phone: document.getElementById('form-client-phone').value,
-        client_address: document.getElementById('form-client-address').value,
-        place_of_supply: document.getElementById('form-place-supply').value,
-        tax_type: taxMode,
-        items: invoiceLineItems,
-        subtotal: taxableSubtotal,
-        tax_rate: taxMode === 'none' ? 0 : 18,
-        cgst_amount: cgst,
-        sgst_amount: sgst,
-        igst_amount: igst,
-        tax_amount: (cgst + sgst + igst),
-        discount: discount,
-        total: grandTotal,
-        payment_mode: document.getElementById('form-payment-mode').value,
-        payment_status: 'Paid',
-        subscription_renewal_date: isTrackingRenewal 
-            ? document.getElementById('form-renewal-date').value 
-            : null,
-            
-        // ⚡ BYPASS: Save it inside the existing 'metadata' JSON column instead!
-        metadata: {
-            renewal_amount: customRenewalAmount
+            const { error } = await sb.from('invoices').insert([invoicePayload]);
+            btn.innerText = "Save Invoice";
+            btn.disabled = false;
+
+            if (error) {
+                alert("Error saving invoice: " + error.message);
+            } else {
+                alert("Invoice saved successfully!");
+                window.location.hash = '#invoices';
+                loadAllData();
+            }
         }
-    };
-
-    const { error } = await sb.from('invoices').insert([invoicePayload]);
-    btn.innerText = "Save Invoice";
-    btn.disabled = false;
-
-    if (error) {
-        alert("Error saving invoice: " + error.message);
-    } else {
-        alert("Invoice saved successfully!");
-        window.location.hash = '#invoices';
-        loadAllData();
-    }
-}
 
         // ============================================================
         // 6. HISTORICAL INVOICES, PRINT & WHATSAPP SHARING
