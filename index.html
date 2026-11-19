@@ -2054,7 +2054,7 @@ body.print-free-invoice .a4-sheet {
                         <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 14px;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                                 <label style="font-size: 13px; font-weight: 600; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                                    <input type="checkbox" id="form-track-renewal" checked style="width: 16px; height: 16px;">
+                                    <input type="checkbox" id="form-track-renewal" checked style="width: 16px; height: 16px;" onchange="renderInvoicePreview()">
                                     Track Annual Renewal
                                 </label>
                             </div>
@@ -2062,7 +2062,7 @@ body.print-free-invoice .a4-sheet {
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                                 <div class="form-group">
                                     <label class="form-label" style="color: #d97706;">Renewal Amount (₹)</label>
-                                    <input type="number" id="form-renewal-amount" class="input-liquid" value="599" min="0" placeholder="e.g. 599">
+                                    <input type="number" id="form-renewal-amount" class="input-liquid" value="599" min="0" placeholder="e.g. 599" oninput="renderInvoicePreview()">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" style="color: #d97706;">Next Renewal Date</label>
@@ -3965,7 +3965,7 @@ body.print-free-invoice .a4-sheet {
             // Generate Dynamic UPI QR Code
             generateInvoiceUPIQRCode(upiId, grandTotal, document.getElementById('form-inv-num').value);
         }
-
+        
         // Real-time Dynamic UPI QR Code generator
         function generateInvoiceUPIQRCode(upiId, amount, invoiceNo) {
             const qrContainer = document.getElementById('qrcode');
@@ -4008,6 +4008,24 @@ body.print-free-invoice .a4-sheet {
             return result + " Only";
         }
 
+    // ⚡ DYNAMIC TERMS & CONDITIONS UPDATE
+    const isTracking = document.getElementById('form-track-renewal').checked;
+    const renewalAmt = parseFloat(document.getElementById('form-renewal-amount').value) || 0;
+    const termsEl = document.getElementById('a4-terms-text');
+
+    if (termsEl) {
+        if (isTracking && renewalAmt > 0) {
+            // Show the custom amount
+            termsEl.innerHTML = `1. This service includes first-year setup & cloud hosting.<br>
+                                 2. An annual renewal fee of ₹${renewalAmt.toLocaleString('en-IN')} is payable from year 2 onwards.<br>
+                                 3. This invoice is fully paid and acknowledged upon generation.`;
+        } else {
+            // If tracking is turned off, remove the renewal clause entirely
+            termsEl.innerHTML = `1. This service includes first-year setup & cloud hosting.<br>
+                                 2. This invoice is fully paid and acknowledged upon generation.`;
+        }
+    }
+        
               // Save Invoice to Supabase
         async function saveInvoiceToSupabase() {
             if (!currentUser) return;
